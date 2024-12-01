@@ -14,7 +14,8 @@
     },
     "categories": {
       "auth": {
-        "barilanfront235787a8": {}
+        "barilanfront235787a8": {},
+        "userPoolGroups": {}
       },
       "function": {
         "barilanfront235787a8CustomMessage": {
