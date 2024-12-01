@@ -27,7 +27,7 @@ const App = () => {
           const session = await fetchAuthSession();
           if (session && session.tokens) {
             setUserName(session.tokens.idToken.payload.name);
-            setuserCustomId(session.tokens.idToken.payload['custom:id'] || []);
+            setuserCustomId(session.tokens.idToken.payload['custom_id'] || []);
             setUserRole(session.tokens.idToken.payload['cognito:groups'] || []);
           }
           setIsAuthenticated(true);
