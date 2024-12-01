@@ -9,7 +9,22 @@
       "UnauthRoleName": "amplify-barilanfront-dev-7e2e9-unauthRole",
       "StackName": "amplify-barilanfront-dev-7e2e9",
       "StackId": "arn:aws:cloudformation:us-east-1:637423566007:stack/amplify-barilanfront-dev-7e2e9/2966dd70-afea-11ef-a8c6-12578591e4e7",
-      "AmplifyAppId": "d1ubuzehz4g9tz"
+      "AmplifyAppId": "d1ubuzehz4g9tz",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-barilanfront-dev-7e2e9-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
+    },
+    "categories": {
+      "auth": {
+        "barilanfront235787a8": {}
+      },
+      "function": {
+        "barilanfront235787a8CustomMessage": {
+          "REDIRECTURL": "https://barilantest.auth.us-east-1.amazoncognito.com",
+          "EMAILSUBJECT": "Bar Ilan App Confrim",
+          "EMAILMESSAGE": "Bar Ilan",
+          "deploymentBucketName": "amplify-barilanfront-dev-7e2e9-deployment",
+          "s3Key": "amplify-builds/barilanfront235787a8CustomMessage-76486436577265745143-build.zip"
+        }
+      }
     }
   }
 }

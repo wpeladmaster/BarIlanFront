@@ -1,1 +1,91 @@
-{}
+{
+  "auth": {
+    "barilanfront235787a8": {
+      "customAuth": false,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "barilanfront235787a8CustomMessage",
+          "triggerProvider": "Cognito"
+        }
+      ],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": [],
+          "passwordPolicyMinLength": 8
+        },
+        "signupAttributes": [
+          "EMAIL",
+          "NAME",
+          "PHONE_NUMBER"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [
+          "EMAIL"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito"
+    }
+  },
+  "function": {
+    "barilanfront235787a8CustomMessage": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_barilanfront235787a8CustomMessage_EMAILMESSAGE": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "barilanfront235787a8CustomMessage"
+        }
+      ]
+    },
+    "AMPLIFY_function_barilanfront235787a8CustomMessage_EMAILSUBJECT": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "barilanfront235787a8CustomMessage"
+        }
+      ]
+    },
+    "AMPLIFY_function_barilanfront235787a8CustomMessage_REDIRECTURL": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "barilanfront235787a8CustomMessage"
+        }
+      ]
+    },
+    "AMPLIFY_function_barilanfront235787a8CustomMessage_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "barilanfront235787a8CustomMessage"
+        }
+      ]
+    },
+    "AMPLIFY_function_barilanfront235787a8CustomMessage_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "barilanfront235787a8CustomMessage"
+        }
+      ]
+    }
+  }
+}

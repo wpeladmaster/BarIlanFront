@@ -1,0 +1,16 @@
+{
+  "trigger": true,
+  "modules": [
+    "verification-link"
+  ],
+  "parentResource": "barilanfront235787a8",
+  "functionName": "barilanfront235787a8CustomMessage",
+  "resourceName": "barilanfront235787a8CustomMessage",
+  "parentStack": "auth",
+  "triggerEnvs": "[\n  {\n    \"key\": \"RESOURCENAME\",\n    \"value\": \"resourceName\"\n  }\n]",
+  "triggerDir": "C:\\snapshot\\amplify-cli\\build\\node_modules\\@aws-amplify\\amplify-category-auth\\provider-utils\\awscloudformation\\triggers\\CustomMessage",
+  "triggerTemplate": "CustomMessage.json.ejs",
+  "triggerEventPath": "CustomMessage.event.json",
+  "roleName": "barilanfront235787a8CustomMessage",
+  "skipEdit": true
+}

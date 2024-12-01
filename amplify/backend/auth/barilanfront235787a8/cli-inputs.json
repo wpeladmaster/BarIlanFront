@@ -1,0 +1,56 @@
+{
+  "version": "1",
+  "cognitoConfig": {
+    "identityPoolName": "barilanfront235787a8_identitypool_235787a8",
+    "allowUnauthenticatedIdentities": false,
+    "resourceNameTruncated": "barila235787a8",
+    "userPoolName": "barilanfront235787a8_userpool_235787a8",
+    "autoVerifiedAttributes": [
+      "email"
+    ],
+    "mfaConfiguration": "OFF",
+    "mfaTypes": [
+      "SMS Text Message"
+    ],
+    "smsAuthenticationMessage": "Your authentication code is {####}",
+    "smsVerificationMessage": "Your verification code is {####}",
+    "emailVerificationSubject": "Your verification code",
+    "emailVerificationMessage": "Your verification code is {####}",
+    "defaultPasswordPolicy": false,
+    "passwordPolicyMinLength": 8,
+    "passwordPolicyCharacters": [],
+    "requiredAttributes": [
+      "email",
+      "name",
+      "phone_number"
+    ],
+    "aliasAttributes": [],
+    "userpoolClientGenerateSecret": false,
+    "userpoolClientRefreshTokenValidity": 30,
+    "userpoolClientWriteAttributes": [
+      "email"
+    ],
+    "userpoolClientReadAttributes": [
+      "email"
+    ],
+    "userpoolClientLambdaRole": "barila235787a8_userpoolclient_lambda_role",
+    "userpoolClientSetAttributes": false,
+    "sharedId": "235787a8",
+    "resourceName": "barilanfront235787a8",
+    "authSelections": "identityPoolAndUserPool",
+    "useDefault": "default",
+    "usernameAttributes": [
+      "email"
+    ],
+    "triggers": {
+      "CustomMessage": [
+        "verification-link"
+      ]
+    },
+    "userPoolGroupList": [],
+    "serviceName": "Cognito",
+    "verificationBucketName": "barilanfront235787a8verificationbucket",
+    "usernameCaseSensitive": false,
+    "useEnabledMfas": true
+  }
+}
