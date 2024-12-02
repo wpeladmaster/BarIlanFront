@@ -23,6 +23,8 @@ const App = () => {
     const checkUserSession = async () => {
       try {
         const user = await getCurrentUser();
+        console.log('User: ', user);
+
         if (user) {
           const session = await fetchAuthSession();
           if (session && session.tokens) {
