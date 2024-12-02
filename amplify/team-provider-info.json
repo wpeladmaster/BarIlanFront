@@ -23,7 +23,7 @@
           "EMAILSUBJECT": "Bar Ilan App Confrim",
           "EMAILMESSAGE": "Bar Ilan",
           "deploymentBucketName": "amplify-barilanfront-dev-7e2e9-deployment",
-          "s3Key": "amplify-builds/barilanfront235787a8CustomMessage-76486436577265745143-build.zip"
+          "s3Key": "amplify-builds/barilanfront235787a8CustomMessage-534a7648536161445658-build.zip"
         }
       }
     }

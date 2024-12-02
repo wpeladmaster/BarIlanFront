@@ -38,7 +38,7 @@
     "sharedId": "235787a8",
     "resourceName": "barilanfront235787a8",
     "authSelections": "identityPoolAndUserPool",
-    "useDefault": "default",
+    "useDefault": "defaultSocial",
     "usernameAttributes": [
       "email"
     ],
@@ -82,6 +82,14 @@
     "authTriggerConnections": "[\n  {\n    \"triggerType\": \"CustomMessage\",\n    \"lambdaFunctionName\": \"barilanfront235787a8CustomMessage\"\n  }\n]",
     "parentStack": {
       "Ref": "AWS::StackId"
-    }
+    },
+    "hostedUI": true,
+    "hostedUIDomainName": "barilanfront46295032-46295032",
+    "authProvidersUserPool": [
+      "Google"
+    ],
+    "hostedUIProviderMeta": "[{\"ProviderName\":\"Google\",\"authorize_scopes\":\"openid email profile\",\"AttributeMapping\":{\"email\":\"email\",\"name\":\"name\",\"phone_number\":\"phoneNumbers\",\"username\":\"sub\"}}]",
+    "authProviders": [],
+    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"https://main.d1ubuzehz4g9tz.amplifyapp.com/\",\"https://main.d1ubuzehz4g9tz.amplifyapp.com/homepage/\"],\"LogoutURLs\":[\"https://main.d1ubuzehz4g9tz.amplifyapp.com/\"]}"
   }
 }
