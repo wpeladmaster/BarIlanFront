@@ -48,7 +48,7 @@ const HomePage = ({ userRole, userCustomId }) => {
         try {
           const token = (await fetchAuthSession()).tokens?.idToken?.toString();
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-          const response = await fetch(`${apiUrl}/fetchinstructors`, {
+          const response = await fetch(`https://uz5qtg0iu1.execute-api.us-east-1.amazonaws.com/test/fetchinstructors`, {
             method: 'GET',
             headers: {
               Authorization: token,
