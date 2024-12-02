@@ -32,7 +32,7 @@ const App = () => {
 
           if (session && session.tokens) {
             setUserName(session.tokens.idToken.payload.name);
-            setuserCustomId(session.tokens.idToken.payload['custom_id'] || []);
+            setuserCustomId(session.tokens.idToken.payload['aud'] || []);
             setUserRole(session.tokens.idToken.payload['cognito:groups'] || []);
           }
           setIsAuthenticated(true);
