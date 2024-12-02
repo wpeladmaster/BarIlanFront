@@ -27,6 +27,9 @@ const App = () => {
 
         if (user) {
           const session = await fetchAuthSession();
+          console.log('session: ', session);
+          console.log('session.tokens: ', session.tokens);
+
           if (session && session.tokens) {
             setUserName(session.tokens.idToken.payload.name);
             setuserCustomId(session.tokens.idToken.payload['custom_id'] || []);
