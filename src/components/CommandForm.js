@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 
 const CommandForm = () => {
   const [command, setCommand] = useState('');
@@ -7,10 +6,18 @@ const CommandForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('https://3lgge7qe53.execute-api.us-east-1.amazonaws.com/stage_media_recorder', {
-        command: `MRCmd.exe ${command}`
+      const response = await fetch('https://3lgge7qe53.execute-api.us-east-1.amazonaws.com/stage_media_recorder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          command: `MRCmd.exe ${command}`
+        })
       });
-      console.log('Response:', response.data);
+
+      const result = await response.json();
+      console.log('Response:', result);
     } catch (error) {
       console.error('Error:', error);
     }
