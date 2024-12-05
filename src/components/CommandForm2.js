@@ -35,6 +35,7 @@ const CommandForm2 = () => {
       <form onSubmit={handleSubmit}>
         <select onChange={(e) => setCommand(e.target.value)} value={command}>
           <option value="">Select Command</option>
+          <option value='\"C:\\Program Files\\Microsoft Office\\root\\Office16\\POWERPNT.EXE\"'>Test Select - Open PowerPoint</option>
           <option value="/E">Start MediaRecorder</option>
           <option value="/R">Start Recording</option>
           <option value="/S">Stop Recording</option>
