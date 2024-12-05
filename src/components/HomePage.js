@@ -10,7 +10,7 @@ import VideoModal from './VideoModal';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import Loader from './Loader';
 import '../style/HomePage.scss';
-import CommandForm from './CommandForm';
+import CommandForm2 from './CommandForm2';
 
 const HomePage = ({ userRole, userCustomId }) => {
   const [instructors, setInstructors] = useState([]);
@@ -178,7 +178,7 @@ const HomePage = ({ userRole, userCustomId }) => {
       )}
 
 
-      <CommandForm />
+      <CommandForm2 />
 
 
       {isAdmin && !selectedInstructor && (
