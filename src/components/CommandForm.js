@@ -7,31 +7,26 @@ const CommandForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      if (!command) {
-        throw new Error('Command cannot be empty');
-      }
       const token = (await fetchAuthSession()).tokens?.idToken?.toString();
       console.log('token: ', token);
-
+      
       const response = await fetch('https://q4p3q6lqab.execute-api.us-east-1.amazonaws.com/recorder-test/media-recorder', {
+        
         method: 'POST',
         headers: {
           Authorization: token,
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           command: `MRCmd.exe ${command}`
         })
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      console.log('Response: ', response);
       const result = await response.json();
       console.log('Response:', result);
     } catch (error) {
-      console.error('Error:', error.message);
+      console.error('Error:', error);
     }
   };
 
