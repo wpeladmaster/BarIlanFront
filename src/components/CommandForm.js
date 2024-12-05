@@ -8,7 +8,7 @@ const CommandForm = () => {
     event.preventDefault();
     try {
       const token = (await fetchAuthSession()).tokens?.idToken?.toString();
-      const response = await fetch('https://q4p3q6lqab.execute-api.us-east-1.amazonaws.com/recorder-test', {
+      const response = await fetch('https://q4p3q6lqab.execute-api.us-east-1.amazonaws.com/recorder-test/media-recorder', {
         method: 'POST',
         headers: {
           Authorization: token,
