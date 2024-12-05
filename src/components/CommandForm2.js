@@ -10,7 +10,7 @@ const CommandForm2 = () => {
         throw new Error('Command cannot be empty');
       }
 
-      const response = await fetch('http://localhost:3000/run-command', {
+      const response = await fetch('http://localhost:3002/run-command', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
