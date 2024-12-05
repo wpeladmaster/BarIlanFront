@@ -7,6 +7,9 @@ const CommandForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      if (!command) {
+        throw new Error('Command cannot be empty');
+      }
       const token = (await fetchAuthSession()).tokens?.idToken?.toString();
       console.log('token: ', token);
 
@@ -21,11 +24,14 @@ const CommandForm = () => {
         })
       });
 
-      console.log('Response: ', response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const result = await response.json();
       console.log('Response:', result);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error:', error.message);
     }
   };
 
