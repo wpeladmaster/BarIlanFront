@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { fetchAuthSession } from 'aws-amplify/auth';
 
 const CommandForm = () => {
   const [command, setCommand] = useState('');
@@ -6,9 +7,11 @@ const CommandForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      const token = (await fetchAuthSession()).tokens?.idToken?.toString();
       const response = await fetch('https://3lgge7qe53.execute-api.us-east-1.amazonaws.com/stage_media_recorder', {
         method: 'POST',
         headers: {
+          Authorization: token,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
