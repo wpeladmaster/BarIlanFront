@@ -9,13 +9,13 @@ const CommandForm = () => {
     try {
       const token = (await fetchAuthSession()).tokens?.idToken?.toString();
       console.log('token: ', token);
-      
+
       const response = await fetch('https://q4p3q6lqab.execute-api.us-east-1.amazonaws.com/recorder-test/media-recorder', {
         
         method: 'POST',
         headers: {
-          Authorization: token,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           command: `MRCmd.exe ${command}`
