@@ -11,7 +11,6 @@ const CommandForm = () => {
       console.log('token: ', token);
 
       const response = await fetch('https://q4p3q6lqab.execute-api.us-east-1.amazonaws.com/recorder-test/media-recorder', {
-        
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
