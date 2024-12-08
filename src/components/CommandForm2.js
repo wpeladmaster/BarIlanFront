@@ -15,7 +15,7 @@ const CommandForm2 = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ command: `"${command}"` }) // נוסיף מרכאות כפולות סביב הנתיב
+        body: JSON.stringify({ command: `"${command}"` })
       });
 
       if (!response.ok) {
