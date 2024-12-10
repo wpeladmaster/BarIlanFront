@@ -1,28 +1,14 @@
 export type AmplifyDependentResourcesAttributes = {
   "auth": {
-    "barilanfront235787a8": {
+    "BarIlanSAML": {
       "AppClientID": "string",
       "AppClientIDWeb": "string",
       "CreatedSNSRole": "string",
       "HostedUIDomain": "string",
-      "IdentityPoolId": "string",
-      "IdentityPoolName": "string",
       "OAuthMetadata": "string",
       "UserPoolArn": "string",
       "UserPoolId": "string",
       "UserPoolName": "string"
-    },
-    "userPoolGroups": {
-      "AdminsGroupRole": "string"
-    }
-  },
-  "function": {
-    "barilanfront235787a8CustomMessage": {
-      "Arn": "string",
-      "LambdaExecutionRole": "string",
-      "LambdaExecutionRoleArn": "string",
-      "Name": "string",
-      "Region": "string"
     }
   }
 }
