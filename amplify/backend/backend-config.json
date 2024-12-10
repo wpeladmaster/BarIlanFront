@@ -1,18 +1,8 @@
 {
   "auth": {
-    "barilanfront235787a8": {
+    "AzureADd": {
       "customAuth": false,
-      "dependsOn": [
-        {
-          "attributes": [
-            "Arn",
-            "Name"
-          ],
-          "category": "function",
-          "resourceName": "barilanfront235787a8CustomMessage",
-          "triggerProvider": "Cognito"
-        }
-      ],
+      "dependsOn": [],
       "frontendAuthConfig": {
         "mfaConfiguration": "OFF",
         "mfaTypes": [
@@ -23,18 +13,14 @@
           "passwordPolicyMinLength": 8
         },
         "signupAttributes": [
-          "EMAIL",
-          "NAME",
-          "PHONE_NUMBER"
+          "EMAIL"
         ],
-        "socialProviders": [
-          "GOOGLE"
-        ],
+        "socialProviders": [],
         "usernameAttributes": [
           "EMAIL"
         ],
         "verificationMechanisms": [
-          "EMAIL"
+          "PHONE_NUMBER"
         ]
       },
       "providerPlugin": "awscloudformation",
@@ -50,60 +36,11 @@
             "IdentityPoolId"
           ],
           "category": "auth",
-          "resourceName": "barilanfront235787a8"
+          "resourceName": "AzureADd"
         }
       ],
       "providerPlugin": "awscloudformation",
       "service": "Cognito-UserPool-Groups"
-    }
-  },
-  "function": {
-    "barilanfront235787a8CustomMessage": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    }
-  },
-  "parameters": {
-    "AMPLIFY_function_barilanfront235787a8CustomMessage_EMAILMESSAGE": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "barilanfront235787a8CustomMessage"
-        }
-      ]
-    },
-    "AMPLIFY_function_barilanfront235787a8CustomMessage_EMAILSUBJECT": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "barilanfront235787a8CustomMessage"
-        }
-      ]
-    },
-    "AMPLIFY_function_barilanfront235787a8CustomMessage_REDIRECTURL": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "barilanfront235787a8CustomMessage"
-        }
-      ]
-    },
-    "AMPLIFY_function_barilanfront235787a8CustomMessage_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "barilanfront235787a8CustomMessage"
-        }
-      ]
-    },
-    "AMPLIFY_function_barilanfront235787a8CustomMessage_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "barilanfront235787a8CustomMessage"
-        }
-      ]
     }
   }
 }

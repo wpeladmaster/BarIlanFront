@@ -1,30 +1,20 @@
 {
   "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-barilanfront-dev-7e2e9-authRole",
-      "UnauthRoleArn": "arn:aws:iam::637423566007:role/amplify-barilanfront-dev-7e2e9-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::637423566007:role/amplify-barilanfront-dev-7e2e9-authRole",
+      "AuthRoleName": "amplify-barilanv1-dev-32a60-authRole",
+      "UnauthRoleArn": "arn:aws:iam::637423566007:role/amplify-barilanv1-dev-32a60-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::637423566007:role/amplify-barilanv1-dev-32a60-authRole",
       "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-barilanfront-dev-7e2e9-deployment",
-      "UnauthRoleName": "amplify-barilanfront-dev-7e2e9-unauthRole",
-      "StackName": "amplify-barilanfront-dev-7e2e9",
-      "StackId": "arn:aws:cloudformation:us-east-1:637423566007:stack/amplify-barilanfront-dev-7e2e9/2966dd70-afea-11ef-a8c6-12578591e4e7",
-      "AmplifyAppId": "d1ubuzehz4g9tz",
-      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-barilanfront-dev-7e2e9-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
+      "DeploymentBucketName": "amplify-barilanv1-dev-32a60-deployment",
+      "UnauthRoleName": "amplify-barilanv1-dev-32a60-unauthRole",
+      "StackName": "amplify-barilanv1-dev-32a60",
+      "StackId": "arn:aws:cloudformation:us-east-1:637423566007:stack/amplify-barilanv1-dev-32a60/ebfab4d0-b6fa-11ef-bc50-1235c5eb738d",
+      "AmplifyAppId": "dbeag5zgu8a6a"
     },
     "categories": {
       "auth": {
-        "barilanfront235787a8": {},
+        "AzureADd": {},
         "userPoolGroups": {}
-      },
-      "function": {
-        "barilanfront235787a8CustomMessage": {
-          "REDIRECTURL": "https://barilantest.auth.us-east-1.amazoncognito.com",
-          "EMAILSUBJECT": "Bar Ilan App Confrim",
-          "EMAILMESSAGE": "Bar Ilan",
-          "deploymentBucketName": "amplify-barilanfront-dev-7e2e9-deployment",
-          "s3Key": "amplify-builds/barilanfront235787a8CustomMessage-534a7648536161445658-build.zip"
-        }
       }
     }
   }
