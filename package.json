@@ -3,12 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@aws-amplify/auth": "^6.8.0",
-    "@aws-amplify/ui-react": "^6.5.2",
+    "@azure/msal-browser": "^3.27.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "aws-amplify": "^6.10.0",
     "aws-sdk": "^2.1691.0",
     "cross-env": "^7.0.3",
     "jwt-decode": "^4.0.0",

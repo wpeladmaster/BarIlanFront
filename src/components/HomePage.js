@@ -7,12 +7,14 @@ import useStudents from '../hooks/useStudents';
 import usePatients from '../hooks/usePatients';
 import useVideos from '../hooks/useVideos';
 import VideoModal from './VideoModal';
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { PublicClientApplication } from '@azure/msal-browser';
 import Loader from './Loader';
 import '../style/HomePage.scss';
 import CommandForm2 from './CommandForm2';
 
-const HomePage = ({ userRole, userCustomId }) => {
+
+
+const HomePage = ({ userRole, userCustomId  }) => {
   const [instructors, setInstructors] = useState([]);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -41,14 +43,37 @@ const HomePage = ({ userRole, userCustomId }) => {
   const isInstructor = useMemo(() => userRole.includes('Instructors'), [userRole]);
   const isStudent = useMemo(() => userRole.includes('Students'), [userRole]);
 
+  const msalConfig = {
+    auth: {
+      clientId: "aadb3f2f-d35f-4080-bc72-2ee32b741120",
+      authority: "https://login.microsoftonline.com/352ed1fa-2f18-487f-a4cf-4804faa235c7/saml2",
+      redirectUri: "http://localhost:3000"
+    }
+  };
+  const [msalInstance, setMsalInstance] = useState(null);
+
+
+  useEffect(() => {
+    const initializeMsal = async () => {
+      const newMsalInstance = new PublicClientApplication(msalConfig);
+      await newMsalInstance.initialize(msalConfig);
+      setMsalInstance(newMsalInstance);
+    };
+
+    initializeMsal();
+  }, []);
   // Effect for fetching instructors (only for Admin users)
   useEffect(() => {
     if (isAdmin) {
       const fetchInstructors = async () => {
         setLoadingInstructors(true);
         try {
-          
-          const token = (await fetchAuthSession()).tokens?.idToken?.toString();
+
+          const token = (await msalInstance.acquireTokenSilent({
+            scopes: ["api://your_api_app_id/access_as_user"] // Replace with your API's app ID URI
+          })).accessToken;
+
+
           console.log('token:', token); 
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
             const response = await fetch(`${apiUrl}/fetchinstructors`, {

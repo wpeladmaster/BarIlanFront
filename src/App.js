@@ -6,11 +6,17 @@ import Footer from './components/Footer';
 import Login from './components/Login';
 import HomePage from './components/HomePage';
 import AdminSearch from './components/AdminSearch';
-import { Amplify } from 'aws-amplify';
-import { fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
-import awsconfig from './aws-exports';
+import { PublicClientApplication } from '@azure/msal-browser';
 
-Amplify.configure(awsconfig);
+const msalConfig = {
+  auth: {
+    clientId: "aadb3f2f-d35f-4080-bc72-2ee32b741120",
+    authority: "https://login.microsoftonline.com/352ed1fa-2f18-487f-a4cf-4804faa235c7/saml2",
+    redirectUri: "http://localhost:3000"
+  }
+};
+
+const msalInstance = new PublicClientApplication(msalConfig);
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -22,25 +28,23 @@ const App = () => {
   useEffect(() => {
     const checkUserSession = async () => {
       try {
-        const user = await getCurrentUser();
-        console.log('User: ', user);
+        // Check for existing MSAL accounts
+        const accounts = msalInstance.getAllAccounts();
+        const userAccount = accounts[0];
 
-        if (user) {
-          const session = await fetchAuthSession();
-          console.log('session: ', session);
-          console.log('session.tokens: ', session.tokens);
-
-          if (session && session.tokens) {
-            setUserName(session.tokens.idToken.payload.name);
-            setuserCustomId(session.tokens.idToken.payload['aud'] || []);
-            setUserRole(session.tokens.idToken.payload['cognito:groups'] || []);
-          }
+        if (userAccount) {
+          // User is authenticated
+          const claims = userAccount.idTokenClaims;
+          setUserName(claims.name);
+          setUserRole(claims.groups || []);
           setIsAuthenticated(true);
         } else {
+          // User is not authenticated
           setIsAuthenticated(false);
         }
       } catch (err) {
         setIsAuthenticated(false);
+        console.error(err);
       } finally {
         setIsLoading(false);
       }
@@ -56,12 +60,12 @@ const App = () => {
   return (
     <Router>
       <main>
-        <Header isAuthenticated={isAuthenticated} onLogout={() => setIsAuthenticated(false)} userName={userName} userRole={userRole} />
+        <Header msalInstance={msalInstance} onLogout={() => setIsAuthenticated(false)} userName={userName} userRole={userRole} />
         <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
           <Route
             path="/homepage"
-            element={isAuthenticated ? <HomePage isAuthenticated={isAuthenticated} userRole={userRole} userCustomId={userCustomId} /> : <Navigate to="/" />}
+            element={isAuthenticated ? <HomePage msalInstance={msalInstance} userRole={userRole} userCustomId={userCustomId} /> : <Navigate to="/" />}
           />
           <Route
             path="/admin-search"

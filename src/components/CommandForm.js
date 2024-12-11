@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { PublicClientApplication } from '@azure/msal-browser';
+
+const msalConfig = {
+  auth: {
+    clientId: "aadb3f2f-d35f-4080-bc72-2ee32b741120",
+    authority: "https://login.microsoftonline.com/352ed1fa-2f18-487f-a4cf-4804faa235c7/saml2",
+    redirectUri: "http://localhost:3000"
+  }
+};
+
+const msalInstance = new PublicClientApplication(msalConfig);
 
 const CommandForm = () => {
   const [command, setCommand] = useState('');
@@ -12,7 +22,10 @@ const CommandForm = () => {
         throw new Error('Command cannot be empty');
       }
       
-      const token = (await fetchAuthSession()).tokens?.idToken?.toString();
+      const token = (await msalInstance.acquireTokenSilent({
+        scopes: ["api://your_api_app_id/access_as_user"] // Replace with your API's app ID URI
+      })).accessToken;
+
       const body = JSON.stringify({
         command: `MRCmd.exe ${command}`
       });
