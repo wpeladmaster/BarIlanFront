@@ -1,14 +1,17 @@
 export type AmplifyDependentResourcesAttributes = {
   "auth": {
-    "BarIlanSAML": {
+    "AzureADd": {
       "AppClientID": "string",
       "AppClientIDWeb": "string",
       "CreatedSNSRole": "string",
-      "HostedUIDomain": "string",
-      "OAuthMetadata": "string",
+      "IdentityPoolId": "string",
+      "IdentityPoolName": "string",
       "UserPoolArn": "string",
       "UserPoolId": "string",
       "UserPoolName": "string"
+    },
+    "userPoolGroups": {
+      "AzureAdGroupGroupRole": "string"
     }
   }
 }

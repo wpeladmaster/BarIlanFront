@@ -1,6 +1,6 @@
 {
   "auth": {
-    "BarIlanSAML": {
+    "AzureADd": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -13,9 +13,7 @@
           "passwordPolicyMinLength": 8
         },
         "signupAttributes": [
-          "EMAIL",
-          "FAMILY_NAME",
-          "NAME"
+          "EMAIL"
         ],
         "socialProviders": [],
         "usernameAttributes": [
@@ -27,6 +25,22 @@
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
+    },
+    "userPoolGroups": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId",
+            "AppClientIDWeb",
+            "AppClientID",
+            "IdentityPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "AzureADd"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito-UserPool-Groups"
     }
   }
 }
