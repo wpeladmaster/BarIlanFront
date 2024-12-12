@@ -4,7 +4,7 @@ import '../style/Header.scss'; // Adjust your styles accordingly
 import { PublicClientApplication } from '@azure/msal-browser';
 
 
-const Header = ({ isAuthenticated, onLogout, setUserRole }) => {
+const Header = ({ setMsalInstance, isAuthenticated, onLogout, setUserRole }) => {
   const [isAuthenticatedState, setIsAuthenticated] = useState(false);
   const [userName, setUserName] = useState('');
 
@@ -17,7 +17,7 @@ const Header = ({ isAuthenticated, onLogout, setUserRole }) => {
     }
   };
 
-  const [msalInstance, setMsalInstance] = useState(null);
+  //const [msalInstance, setMsalInstance] = useState(null);
 
   useEffect(() => {
     const initializeMsal = async () => {
@@ -29,7 +29,7 @@ const Header = ({ isAuthenticated, onLogout, setUserRole }) => {
     initializeMsal();
   }, []);
 
-  console.log('msalInstance:', msalInstance);
+  console.log('msalInstance:', setMsalInstance);
 
   // Pass MSAL instance as a prop (assuming initialization happens elsewhere)
   const handleLogin = async (msalInstance) => {
@@ -40,7 +40,7 @@ const Header = ({ isAuthenticated, onLogout, setUserRole }) => {
 
       console.error('loginResponse:', loginResponse);
 
-      setUserName(loginResponse.account.username);
+      setUserName(loginResponse.name);
       setUserRole(loginResponse.idTokenClaims.groups || []);
       setIsAuthenticated(true);
       console.log('Iam logged in');
@@ -64,12 +64,12 @@ const Header = ({ isAuthenticated, onLogout, setUserRole }) => {
       <div className="auth-wrap">
         {isAuthenticatedState ? (
           <div className='inner'>
-            <button onClick={() => handleLogout(msalInstance)}>Logout</button>
+            <button onClick={() => handleLogout(setMsalInstance)}>Logout</button>
             <span>Welcome, {userName}</span>
           </div>
         ) : (
           <div className='inner'>
-            <button onClick={() => handleLogin(msalInstance)}>Login</button>
+            <button onClick={() => handleLogin(setMsalInstance)}>Login</button>
           </div>
         )}
       </div>
