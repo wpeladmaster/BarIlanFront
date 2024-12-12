@@ -4,8 +4,8 @@ import '../style/Header.scss'; // Adjust your styles accordingly
 import { PublicClientApplication } from '@azure/msal-browser';
 
 
-const Header = ({ isAuthenticated, onLogout, setUserRole }) => {
-  const [isAuthenticatedState, setIsAuthenticated] = useState(false); // Declare and initialize state
+const Header = ({ msalInstance, onLogout, setUserRole }) => {
+  const [isAuthenticatedState, setIsAuthenticated] = useState(false);
   const [userName, setUserName] = useState('');
 
   // Move MSAL configuration outside the component
@@ -13,7 +13,7 @@ const Header = ({ isAuthenticated, onLogout, setUserRole }) => {
     auth: {
       clientId: "aadb3f2f-d35f-4080-bc72-2ee32b741120",
       authority: "https://login.microsoftonline.com/352ed1fa-2f18-487f-a4cf-4804faa235c7/saml2",
-      redirectUri: "http://localhost:3000" // Adjust the redirect URI as needed
+      redirectUri: "http://localhost:3000/homepage"
     }
   };
 
@@ -48,7 +48,7 @@ const Header = ({ isAuthenticated, onLogout, setUserRole }) => {
     try {
       msalInstance.logout();
       onLogout();
-      setIsAuthenticated(false); // Update state after logout
+      setIsAuthenticated(false);
     } catch (error) {
       console.error('Logout error:', error);
     }
