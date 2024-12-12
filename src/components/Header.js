@@ -29,7 +29,7 @@ const Header = ({ isAuthenticated, onLogout, setUserRole }) => {
     initializeMsal();
   }, []);
 
-  console.error('msalInstance:', msalInstance);
+  console.log('msalInstance:', msalInstance);
 
   // Pass MSAL instance as a prop (assuming initialization happens elsewhere)
   const handleLogin = async (msalInstance) => {
@@ -43,7 +43,7 @@ const Header = ({ isAuthenticated, onLogout, setUserRole }) => {
       setUserName(loginResponse.account.username);
       setUserRole(loginResponse.idTokenClaims.groups || []);
       setIsAuthenticated(true);
-      console.error('Iam logged in');
+      console.log('Iam logged in');
     } catch (error) {
       console.error('Login error:', error);
     }

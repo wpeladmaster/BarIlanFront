@@ -33,10 +33,10 @@ const HomePage = ({ userRole, userCustomId  }) => {
   const { patients, fetchPatients } = usePatients();
   const { videoList, fetchVideos, groupedVideos } = useVideos();
 
-  useEffect(() => {
-    console.log('userRole:', userRole);
-    console.log('userCustomId:', userCustomId);
-  }, [userRole, userCustomId]);
+  // useEffect(() => {
+  //   console.log('userRole:', userRole);
+  //   console.log('userCustomId:', userCustomId);
+  // }, [userRole, userCustomId]);
 
   // Memoize user roles to avoid recalculating on every render
   const isAdmin = useMemo(() => userRole.includes('Admins'), [userRole]);
