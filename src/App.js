@@ -38,6 +38,7 @@ const App = () => {
           setUserName(claims.name);
           setUserRole(claims.groups || []);
           setIsAuthenticated(true);
+          console.error('userAccount:', userAccount);
         } else {
           // User is not authenticated
           setIsAuthenticated(false);
