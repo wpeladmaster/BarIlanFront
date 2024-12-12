@@ -35,10 +35,11 @@ const App = () => {
         if (userAccount) {
           // User is authenticated
           const claims = userAccount.idTokenClaims;
-          setUserName(claims.name);
+          setUserName(userAccount.name);
           setUserRole(claims.groups || []);
           setIsAuthenticated(true);
           console.log('userAccount:', userAccount);
+          console.log('userRole:', userRole);
         } else {
           // User is not authenticated
           setIsAuthenticated(false);
