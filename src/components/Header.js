@@ -4,7 +4,7 @@ import '../style/Header.scss'; // Adjust your styles accordingly
 import { PublicClientApplication } from '@azure/msal-browser';
 
 
-const Header = ({ msalInstance, onLogout, setUserRole }) => {
+const Header = ({ isAuthenticated, onLogout, setUserRole }) => {
   const [isAuthenticatedState, setIsAuthenticated] = useState(false);
   const [userName, setUserName] = useState('');
 
@@ -13,7 +13,7 @@ const Header = ({ msalInstance, onLogout, setUserRole }) => {
     auth: {
       clientId: "aadb3f2f-d35f-4080-bc72-2ee32b741120",
       authority: "https://login.microsoftonline.com/352ed1fa-2f18-487f-a4cf-4804faa235c7/saml2",
-      redirectUri: "http://localhost:3000/homepage"
+      redirectUri: "https://main.dbeag5zgu8a6a.amplifyapp.com"
     }
   };
 
