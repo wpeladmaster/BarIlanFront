@@ -16,6 +16,8 @@ const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
         scopes: ["user.read"],
       });
       console.log("Header.js: Login successful:", loginResponse);
+      const accounts = msalInstance.getAllAccounts();
+      console.log("Header.js: Logged-in accounts:", accounts);
     } catch (error) {
       console.error("Header.js: Login Error:", error);
     }
