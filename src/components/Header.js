@@ -1,76 +1,39 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../style/Header.scss';
-import { PublicClientApplication } from '@azure/msal-browser';
 
-const msalConfig = {
-  auth: {
-    clientId: 'aadb3f2f-d35f-4080-bc72-2ee32b741120',
-    authority: 'https://login.microsoftonline.com/352ed1fa-2f18-487f-a4cf-4804faa235c7',
-    redirectUri: 'https://main.d3u5rxv1b6pn2o.amplifyapp.com',
-  },
-};
-
-const msalInstance = new PublicClientApplication(msalConfig);
-
-const Header = ({ setIsAuthenticated, setUserName, setUserRole, setUserCustomId }) => {
-  useEffect(() => {
-    const checkUserSession = async () => {
-      try {
-        const accounts = msalInstance.getAllAccounts();
-        const userAccount = accounts[0];
-
-        if (userAccount) {
-          const claims = userAccount.idTokenClaims;
-          setUserName(userAccount.name);
-          setUserRole(claims.groups || []);
-          setUserCustomId(claims.extension_CustomID || ''); // Example of custom claim
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch (err) {
-        console.error('Session Check Error:', err);
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkUserSession();
-  }, [setIsAuthenticated, setUserName, setUserRole, setUserCustomId]);
-
+const Header = ({ msalInstance, isAuthenticated, onLogout, userName, userRole }) => {
   const handleLogin = async () => {
     try {
       const loginResponse = await msalInstance.loginPopup({
-        scopes: ['user.read', 'openid', 'profile'], // Add required scopes
+        scopes: ["user.read"], // Add required scopes
       });
-      const claims = loginResponse.idTokenClaims;
-      setUserName(loginResponse.account.name);
-      setUserRole(claims.groups || []);
-      setUserCustomId(claims.extension_CustomID || '');
-      setIsAuthenticated(true);
+
+      const { name, idTokenClaims } = loginResponse.account;
+      const roles = idTokenClaims.groups || [];
+
+      console.log("Login Successful:", name, roles);
     } catch (error) {
-      console.error('Login Error:', error);
+      console.error("Login Error:", error);
     }
   };
 
   const handleLogout = async () => {
     try {
       await msalInstance.logoutPopup();
-      setIsAuthenticated(false);
-      setUserName('');
-      setUserRole([]);
-      setUserCustomId('');
+      onLogout();
     } catch (error) {
-      console.error('Logout Error:', error);
+      console.error("Logout Error:", error);
     }
   };
 
   return (
     <header>
       <div className="auth-wrap">
-        {msalInstance.getAllAccounts().length > 0 ? (
+        {isAuthenticated ? (
           <div className="inner">
             <button onClick={handleLogout}>Logout</button>
+            <span>Welcome, {userName}</span>
           </div>
         ) : (
           <div className="inner">
@@ -86,6 +49,11 @@ const Header = ({ setIsAuthenticated, setUserName, setUserRole, setUserCustomId 
           <li>
             <Link to="/">Home</Link>
           </li>
+          {userRole.includes("Admins") && (
+            <li>
+              <Link to="/admin-search">Admin Search</Link>
+            </li>
+          )}
         </ul>
       </nav>
     </header>
