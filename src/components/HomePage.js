@@ -11,10 +11,9 @@ import { PublicClientApplication } from '@azure/msal-browser';
 import Loader from './Loader';
 import '../style/HomePage.scss';
 import CommandForm2 from './CommandForm2';
+import fetchGroupNames from '../utils/fetchGroupNames'; // Import your fetchGroupNames function
 
-
-
-const HomePage = ({ userRole, userCustomId  }) => {
+const HomePage = ({ userRole, userCustomId }) => {
   const [instructors, setInstructors] = useState([]);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -23,20 +22,15 @@ const HomePage = ({ userRole, userCustomId  }) => {
   const [selectedSession, setSelectedSession] = useState(null);
   const [activeTab, setActiveTab] = useState(null);
   const [videoTimes, setVideoTimes] = useState({});
-
   const [loadingInstructors, setLoadingInstructors] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [loadingPatients, setLoadingPatients] = useState(false);
   const [loadingVideos, setLoadingVideos] = useState(false);
+  const [groupNames, setGroupNames] = useState([]); // State for group names
 
   const { students, fetchStudents } = useStudents();
   const { patients, fetchPatients } = usePatients();
   const { videoList, fetchVideos, groupedVideos } = useVideos();
-
-  // useEffect(() => {
-  //   console.log('userRole:', userRole);
-  //   console.log('userCustomId:', userCustomId);
-  // }, [userRole, userCustomId]);
 
   // Memoize user roles to avoid recalculating on every render
   const isAdmin = useMemo(() => userRole.includes('Admins'), [userRole]);
@@ -52,7 +46,6 @@ const HomePage = ({ userRole, userCustomId  }) => {
   };
   const [msalInstance, setMsalInstance] = useState(null);
 
-
   useEffect(() => {
     const initializeMsal = async () => {
       const newMsalInstance = new PublicClientApplication(msalConfig);
@@ -62,21 +55,46 @@ const HomePage = ({ userRole, userCustomId  }) => {
 
     initializeMsal();
   }, []);
+
+  // Fetch group names for user role
+  useEffect(() => {
+    const fetchGroups = async () => {
+      if (!msalInstance) return;
+
+      try {
+        const token = (await msalInstance.acquireTokenSilent({
+          scopes: ["api://your_api_app_id/access_as_user"] // Replace with your API's app ID URI
+        })).accessToken;
+
+        console.log('Fetched access token for group API:', token);
+
+        const groupIds = userRole.filter(role => role.includes('Group')).map(role => role.split('-')[1]); // Assuming group IDs are in the role string (e.g., Group-123)
+        console.log('Group IDs:', groupIds);
+
+        const groupNamesFetched = await fetchGroupNames(groupIds, token);
+        console.log('Fetched group names:', groupNamesFetched);
+        setGroupNames(groupNamesFetched);
+      } catch (error) {
+        console.error('Error fetching group names:', error);
+      }
+    };
+
+    fetchGroups();
+  }, [userRole, msalInstance]);
+
   // Effect for fetching instructors (only for Admin users)
   useEffect(() => {
     if (isAdmin) {
       const fetchInstructors = async () => {
         setLoadingInstructors(true);
         try {
-
           const token = (await msalInstance.acquireTokenSilent({
             scopes: ["api://your_api_app_id/access_as_user"] // Replace with your API's app ID URI
           })).accessToken;
 
-
-          console.log('token:', token); 
+          console.log('Fetched access token for instructors API:', token);
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-            const response = await fetch(`${apiUrl}/fetchinstructors`, {
+          const response = await fetch(`${apiUrl}/fetchinstructors`, {
             method: 'GET',
             headers: {
               Authorization: token,
@@ -91,6 +109,7 @@ const HomePage = ({ userRole, userCustomId  }) => {
           const data = await response.json();
           const uniqueInstructors = data.unique_instructors_codes || [];
           setInstructors(uniqueInstructors);
+          console.log('Fetched instructors:', uniqueInstructors);
         } catch (error) {
           console.error('Error fetching instructors:', error);
         } finally {
@@ -167,6 +186,19 @@ const HomePage = ({ userRole, userCustomId  }) => {
 
   return (
     <div className="main-container homepage">
+      <div>
+        <h2>Group Names</h2>
+        {groupNames.length > 0 ? (
+          <ul>
+            {groupNames.map((groupName, index) => (
+              <li key={index}>{groupName}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No groups available</p>
+        )}
+      </div>
+
       {(selectedInstructor || selectedStudent || selectedVideo || selectedPatient) && (
         <div className="breadcrumbs">
           <span onClick={() => { 
@@ -202,9 +234,7 @@ const HomePage = ({ userRole, userCustomId  }) => {
         </div>
       )}
 
-
       <CommandForm2 />
-
 
       {isAdmin && !selectedInstructor && (
         loadingInstructors ? <Loader /> : (
@@ -241,7 +271,6 @@ const HomePage = ({ userRole, userCustomId  }) => {
           handleTimeUpdate={handleTimeUpdate}
         />
       )}
-
     </div>
   );
 };

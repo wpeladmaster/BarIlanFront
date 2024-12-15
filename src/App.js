@@ -55,10 +55,13 @@ const App = () => {
           }
 
           const roles = account?.idTokenClaims?.groups || [];
+          console.log("App.js: User roles:", roles); // Log roles
+
           setUserRole(roles);
 
           // Fetch group names using group IDs from the roles (or modify this if needed)
           const groupNames = await fetchGroupNames(roles, tokenResponse.accessToken);
+          console.log("App.js: Group names fetched:", groupNames); // Log group names
           setGroupNames(groupNames); // Store the fetched group names in state
         } else {
           console.log("App.js: No active account.");
@@ -73,6 +76,11 @@ const App = () => {
     checkSession();
   }, [instance]);
 
+  useEffect(() => {
+    console.log("App.js: User Role Updated:", userRole); // Log user roles when updated
+    console.log("App.js: Group Names Updated:", groupNames); // Log group names when updated
+  }, [userRole, groupNames]);
+
   const handleLogout = async () => {
     try {
       console.log('App.js: Logging out...');
@@ -82,12 +90,14 @@ const App = () => {
       setUserRole([]);
       setAccessToken('');
       setGroupNames([]); // Clear group names on logout
+      console.log("App.js: Logout successful, state cleared.");
     } catch (error) {
       console.error('App.js: Logout error:', error);
     }
   };
 
   if (isLoading) {
+    console.log("App.js: Loading state is active.");
     return <div>Loading...</div>;
   }
 
