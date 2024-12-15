@@ -19,22 +19,22 @@ const Header = ({ setMsalInstance, isAuthenticated, onLogout, setUserRole }) => 
 
   //const [msalInstance, setMsalInstance] = useState(null);
 
-  useEffect(() => {
-    const initializeMsal = async () => {
-      const newMsalInstance = new PublicClientApplication(msalConfig);
-      await newMsalInstance.initialize(msalConfig);
-      setMsalInstance(newMsalInstance);
-    };
+  // useEffect(() => {
+  //   const initializeMsal = async () => {
+  //     const newMsalInstance = new PublicClientApplication(msalConfig);
+  //     await newMsalInstance.initialize(msalConfig);
+  //     setMsalInstance(newMsalInstance);
+  //   };
 
-    initializeMsal();
-  }, []);
+  //   initializeMsal();
+  // }, []);
 
   console.log('msalInstance:', setMsalInstance);
 
   // Pass MSAL instance as a prop (assuming initialization happens elsewhere)
-  const handleLogin = async (msalInstance) => {
+  const handleLogin = async (setMsalInstance) => {
     try {
-      const loginResponse = await msalInstance.loginPopup({
+      const loginResponse = await setMsalInstance.loginPopup({
         scopes: ["user.read"] // Add necessary scopes
       });
 
@@ -49,9 +49,9 @@ const Header = ({ setMsalInstance, isAuthenticated, onLogout, setUserRole }) => 
     }
   };
 
-  const handleLogout = async (msalInstance) => {
+  const handleLogout = async (setMsalInstance) => {
     try {
-      msalInstance.logout();
+      setMsalInstance.logout();
       onLogout();
       setIsAuthenticated(false);
     } catch (error) {
