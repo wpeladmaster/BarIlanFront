@@ -6,8 +6,6 @@ import { useMsal } from '@azure/msal-react';
 const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
   const { instance: msalInstance } = useMsal();
 
-  console.log("Header.js: Received msalInstance:", msalInstance);
-
   const handleLogin = async () => {
     try {
       console.log("Header.js: Starting login...");
@@ -41,7 +39,7 @@ const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
         {isAuthenticated ? (
           <div className="inner">
             <button onClick={handleLogout}>Logout</button>
-            <span>Welcome, {userName}</span>
+            <span>Welcome, {userName || "User"}!</span>
           </div>
         ) : (
           <div className="inner">

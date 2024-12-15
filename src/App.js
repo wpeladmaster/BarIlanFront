@@ -23,7 +23,7 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
-  const [userRole, setUserRole] = useState('');
+  const [userRole, setUserRole] = useState([]);
 
   useEffect(() => {
     const checkUserSession = async () => {
@@ -31,8 +31,11 @@ const App = () => {
         const accounts = msalInstance.getAllAccounts();
         if (accounts.length > 0) {
           const userAccount = accounts[0];
-          setUserName(userAccount.name);
-          setUserRole(userAccount.idTokenClaims.groups || []);
+          console.log("App.js: User Account Found:", userAccount);
+
+          // Extract user details
+          setUserName(userAccount.name || "User");
+          setUserRole(userAccount.idTokenClaims?.groups || []);
           setIsAuthenticated(true);
         }
       } catch (err) {
@@ -55,7 +58,11 @@ const App = () => {
         <main>
           <Header
             isAuthenticated={isAuthenticated}
-            onLogout={() => setIsAuthenticated(false)}
+            onLogout={() => {
+              setIsAuthenticated(false);
+              setUserName('');
+              setUserRole([]);
+            }}
             userName={userName}
             userRole={userRole}
           />
