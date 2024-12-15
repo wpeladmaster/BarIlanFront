@@ -35,9 +35,10 @@ const App = () => {
 
         const account = instance.getActiveAccount() || allAccounts[0];
         if (account) {
-          console.log("App.js: User account found:", account.username);
+          console.log("App.js: Account found:", account);
+          console.log("App.js: User account found:", account.idTokenClaims.name);
           setIsAuthenticated(true);
-          setUserName(account.username);
+          setUserName(account.idTokenClaims.name);
 
           // Fetch token silently
           const tokenResponse = await instance.acquireTokenSilent({
@@ -53,7 +54,7 @@ const App = () => {
           }
 
           // Example: Fetch roles from token (adjust as per your logic)
-          const roles = tokenResponse?.idTokenClaims?.roles || [];
+          const roles = tokenResponse?.idTokenClaims?.groups || [];
           setUserRole(roles);
         } else {
           console.log("App.js: No active account.");
