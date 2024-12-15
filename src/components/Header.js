@@ -10,6 +10,19 @@ const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
 
   const { instance: msalInstance } = useMsal();
 
+  const handleLogin = async () => {
+    try {
+      console.log("Header.js: Starting login...");
+      await msalInstance.loginPopup({
+        scopes: ["user.read"],
+      });
+      console.log("Header.js: Login successful.");
+      window.location.reload(); // Refresh to sync session state with App.js
+    } catch (error) {
+      console.error("Header.js: Login Error:", error);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       console.log("Header.js: Logging out...");
@@ -31,7 +44,7 @@ const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
           </div>
         ) : (
           <div className="inner">
-            <span>Please log in to access the application.</span>
+            <button onClick={handleLogin}>Login</button>
           </div>
         )}
       </div>
