@@ -20,6 +20,7 @@ const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
       window.location.reload(); // Refresh to sync session state with App.js
     } catch (error) {
       console.error("Header.js: Login Error:", error);
+      alert("Login failed. Please try again.");
     }
   };
 
@@ -31,34 +32,44 @@ const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
       console.log("Header.js: Logout successful.");
     } catch (error) {
       console.error("Header.js: Logout Error:", error);
+      alert("Logout failed. Please try again.");
     }
   };
 
   return (
-    <header>
+    <header className="header">
+      {/* Authentication Controls */}
       <div className="auth-wrap">
         {isAuthenticated ? (
-          <div className="inner">
-            <button onClick={handleLogout}>Logout</button>
-            <span>Welcome, {userName || "User"}!</span>
+          <div className="auth-inner">
+            <button onClick={handleLogout} className="logout-btn">Logout</button>
+            <span className="welcome-text">Welcome, {userName || "User"}!</span>
           </div>
         ) : (
-          <div className="inner">
-            <button onClick={handleLogin}>Login</button>
+          <div className="auth-inner">
+            <button onClick={handleLogin} className="login-btn">Login</button>
           </div>
         )}
       </div>
+
+      {/* Logo Section */}
       <div className="logo">
-        <img src="../../images/bar-ilan-logo.png" alt="Logo" />
+        <img
+          src="/images/bar-ilan-logo.png" // Updated to ensure proper relative path
+          alt="Bar-Ilan Logo"
+          className="logo-img"
+        />
       </div>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
+
+      {/* Navigation Menu */}
+      <nav className="nav-menu">
+        <ul className="nav-list">
+          <li className="nav-item">
+            <Link to="/" className="nav-link">Home</Link>
           </li>
           {isAuthenticated && userRole.includes("Admins") && (
-            <li>
-              <Link to="/admin-search">Admin Search</Link>
+            <li className="nav-item">
+              <Link to="/admin-search" className="nav-link">Admin Search</Link>
             </li>
           )}
         </ul>
