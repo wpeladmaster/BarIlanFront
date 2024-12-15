@@ -19,49 +19,60 @@ const App = () => {
 
   useEffect(() => {
     const checkUserSession = async () => {
+      console.log("App.js: Checking user session...");
+
       try {
         const accounts = instance.getAllAccounts();
+        console.log("App.js: Accounts found:", accounts);
+
         if (accounts.length > 0) {
           const userAccount = accounts[0];
           console.log("App.js: User Account Found:", userAccount);
-  
-          const tokenResponse = await instance.acquireTokenSilent({
-            account: userAccount,
-            scopes: ["https://graph.microsoft.com/.default"],
-          });
-  
-          setAccessToken(tokenResponse.accessToken);
-  
-          const groupIds = userAccount.idTokenClaims.groups || [];
-          console.log("App.js: User Groups (IDs):", groupIds);  // Log the group IDs here
-  
-          // If groupIds is empty, there's likely a problem retrieving it
-          if (groupIds.length === 0) {
-            console.error("No groups found for the user.");
+
+          try {
+            const tokenResponse = await instance.acquireTokenSilent({
+              account: userAccount,
+              scopes: ["https://graph.microsoft.com/.default"],
+            });
+            console.log("App.js: Token Response:", tokenResponse);
+            setAccessToken(tokenResponse.accessToken);
+
+            const groupIds = userAccount.idTokenClaims.groups || [];
+            console.log("App.js: User Groups (IDs):", groupIds);
+
+            if (groupIds.length === 0) {
+              console.warn("App.js: No groups found for the user.");
+            }
+
+            const groupNames = await fetchGroupNames(groupIds, tokenResponse.accessToken);
+            console.log("App.js: User Groups (Names):", groupNames);
+
+            setUserName(userAccount.name || "User");
+            setUserRole(groupNames || []);
+            console.log("App.js: Updated userName:", userAccount.name);
+            console.log("App.js: Updated userRole:", groupNames);
+
+            setIsAuthenticated(true);
+          } catch (tokenError) {
+            console.error("App.js: Error acquiring token:", tokenError);
+            setIsAuthenticated(false);  // Ensure fallback on error
           }
-  
-          const groupNames = await fetchGroupNames(groupIds, tokenResponse.accessToken);
-          console.log("App.js: User Groups (Names):", groupNames);  // Log group names after fetching
-  
-          // Extract user details
-          setUserName(userAccount.name || "User");
-          setUserRole(groupNames || []);
-          console.log("App.js: Updated userName:", userAccount.name);
-          console.log("App.js: Updated userRole:", groupNames);
-          setIsAuthenticated(true);
+        } else {
+          console.warn("App.js: No user accounts found.");
         }
       } catch (err) {
         console.error("App.js: Error checking session:", err);
+        setIsAuthenticated(false);  // Ensure fallback on error
       } finally {
         setIsLoading(false);
       }
     };
-  
+
     checkUserSession();
   }, [instance]);
-  
-  
+
   if (isLoading) {
+    console.log("App.js: Loading...");
     return <div>Loading...</div>;
   }
 
