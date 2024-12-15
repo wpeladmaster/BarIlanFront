@@ -9,7 +9,7 @@ import Login from './components/Login';
 import HomePage from './components/HomePage';
 import AdminSearch from './components/AdminSearch';
 
-import fetchGroupNames from './utils/fetchGroupNames';
+import fetchGroupNames from './utils/fetchGroupNames'; // Import the updated fetchGroupNames
 import { loginRequest } from './authConfig';
 
 const App = () => {
@@ -19,6 +19,7 @@ const App = () => {
   const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState([]);
   const [accessToken, setAccessToken] = useState('');
+  const [groupNames, setGroupNames] = useState([]); // State to store fetched group names
 
   useEffect(() => {
     const checkSession = async () => {
@@ -55,6 +56,10 @@ const App = () => {
 
           const roles = account?.idTokenClaims?.groups || [];
           setUserRole(roles);
+
+          // Fetch group names using group IDs from the roles (or modify this if needed)
+          const groupNames = await fetchGroupNames(roles, tokenResponse.accessToken);
+          setGroupNames(groupNames); // Store the fetched group names in state
         } else {
           console.log("App.js: No active account.");
         }
@@ -76,6 +81,7 @@ const App = () => {
       setUserName('');
       setUserRole([]);
       setAccessToken('');
+      setGroupNames([]); // Clear group names on logout
     } catch (error) {
       console.error('App.js: Logout error:', error);
     }
@@ -101,13 +107,13 @@ const App = () => {
           />
           <Route
             path="/homepage"
-            element={isAuthenticated ? <HomePage userRole={userRole} /> : <Navigate to="/" />}
+            element={isAuthenticated ? <HomePage userRole={userRole} groupNames={groupNames} /> : <Navigate to="/" />}
           />
           <Route
             path="/admin-search"
             element={
               isAuthenticated && userRole.includes('Admins') ? (
-                <AdminSearch />
+                <AdminSearch groupNames={groupNames} />
               ) : (
                 <Navigate to="/" />
               )
