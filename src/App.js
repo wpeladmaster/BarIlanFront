@@ -53,8 +53,7 @@ const App = () => {
             console.log("App.js: No access token available.");
           }
 
-          // Example: Fetch roles from token (adjust as per your logic)
-          const roles = tokenResponse?.idTokenClaims?.groups || [];
+          const roles = account?.idTokenClaims?.groups || [];
           setUserRole(roles);
         } else {
           console.log("App.js: No active account.");
