@@ -16,6 +16,7 @@ const msalConfig = {
   },
 };
 
+// Initialize MSAL instance once
 const msalInstance = new PublicClientApplication(msalConfig);
 
 const App = () => {
@@ -37,7 +38,7 @@ const App = () => {
           setIsAuthenticated(true);
         }
       } catch (err) {
-        console.error(err);
+        console.error("Error checking session:", err);
       } finally {
         setIsLoading(false);
       }

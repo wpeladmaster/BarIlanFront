@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import '../style/Header.scss';
 
 const Header = ({ msalInstance, isAuthenticated, onLogout, userName, userRole }) => {
+  // Debugging: Log msalInstance and its state
+  console.log("MSAL Instance in Header:", msalInstance);
+
   const handleLogin = async () => {
     try {
       const loginResponse = await msalInstance.loginPopup({
