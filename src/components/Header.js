@@ -4,30 +4,17 @@ import '../style/Header.scss';
 import { useMsal } from '@azure/msal-react';
 
 const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
+  console.log("Header.js: isAuthenticated:", isAuthenticated);
   console.log("Header.js: userName:", userName);
   console.log("Header.js: userRole:", userRole);
 
   const { instance: msalInstance } = useMsal();
 
-  const handleLogin = async () => {
-    try {
-      console.log("Header.js: Starting login...");
-      const loginResponse = await msalInstance.loginPopup({
-        scopes: ["user.read"],
-      });
-      console.log("Header.js: Login successful:", loginResponse);
-      const accounts = msalInstance.getAllAccounts();
-      console.log("Header.js: Logged-in accounts:", accounts);
-    } catch (error) {
-      console.error("Header.js: Login Error:", error);
-    }
-  };
-
   const handleLogout = async () => {
     try {
       console.log("Header.js: Logging out...");
       await msalInstance.logoutPopup();
-      onLogout();
+      onLogout(); // Notify App.js to update session state
       console.log("Header.js: Logout successful.");
     } catch (error) {
       console.error("Header.js: Logout Error:", error);
@@ -40,11 +27,11 @@ const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
         {isAuthenticated ? (
           <div className="inner">
             <button onClick={handleLogout}>Logout</button>
-            <span>Welcome, {userName || "User"}!</span> {/* Display the userName here */}
+            <span>Welcome, {userName || "User"}!</span>
           </div>
         ) : (
           <div className="inner">
-            <button onClick={handleLogin}>Login</button>
+            <span>Please log in to access the application.</span>
           </div>
         )}
       </div>
@@ -56,7 +43,7 @@ const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
           <li>
             <Link to="/">Home</Link>
           </li>
-          {userRole.includes("Admins") && (
+          {isAuthenticated && userRole.includes("Admins") && (
             <li>
               <Link to="/admin-search">Admin Search</Link>
             </li>
