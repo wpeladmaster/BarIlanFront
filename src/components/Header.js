@@ -4,6 +4,9 @@ import '../style/Header.scss';
 import { useMsal } from '@azure/msal-react';
 
 const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
+  console.log("Header.js: userName:", userName);
+  console.log("Header.js: userRole:", userRole);
+
   const { instance: msalInstance } = useMsal();
 
   const handleLogin = async () => {

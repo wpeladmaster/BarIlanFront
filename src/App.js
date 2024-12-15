@@ -24,24 +24,25 @@ const App = () => {
         if (accounts.length > 0) {
           const userAccount = accounts[0];
           console.log("App.js: User Account Found:", userAccount);
-
+  
           const tokenResponse = await instance.acquireTokenSilent({
             account: userAccount,
             scopes: ["https://graph.microsoft.com/.default"],
           });
-
+  
           setAccessToken(tokenResponse.accessToken);
-
+  
           const groupIds = userAccount.idTokenClaims.groups || [];
           console.log("App.js: User Groups (IDs):", groupIds);
-
+  
           const groupNames = await fetchGroupNames(groupIds, tokenResponse.accessToken);
           console.log("App.js: User Groups (Names):", groupNames);
-
-          // Extract user details
+  
           setUserName(userAccount.name || "User");
           setUserRole(groupNames || []);
           setIsAuthenticated(true);
+  
+          console.log("App.js: Authenticated:", true);
         }
       } catch (err) {
         console.error("App.js: Error checking session:", err);
@@ -49,9 +50,11 @@ const App = () => {
         setIsLoading(false);
       }
     };
-
+  
     checkUserSession();
   }, [instance]);
+  
+  
 
   if (isLoading) {
     return <div>Loading...</div>;
