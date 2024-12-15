@@ -13,10 +13,6 @@ const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
         scopes: ["user.read"],
       });
       console.log("Header.js: Login successful:", loginResponse);
-
-      const { name, idTokenClaims } = loginResponse.account;
-      const roles = idTokenClaims.groups || [];
-      console.log("Header.js: User details:", name, roles);
     } catch (error) {
       console.error("Header.js: Login Error:", error);
     }
@@ -39,7 +35,7 @@ const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
         {isAuthenticated ? (
           <div className="inner">
             <button onClick={handleLogout}>Logout</button>
-            <span>Welcome, {userName || "User"}!</span>
+            <span>Welcome, {userName || "User"}!</span> {/* Display the userName here */}
           </div>
         ) : (
           <div className="inner">
