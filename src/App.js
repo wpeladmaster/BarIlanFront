@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import Login from './components/Login';
 import HomePage from './components/HomePage';
 import AdminSearch from './components/AdminSearch';
+import fetchGroupNames from './utils/fetchGroupNames';
 import { PublicClientApplication } from '@azure/msal-browser';
 import { MsalProvider } from '@azure/msal-react';
 
@@ -24,6 +25,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState([]);
+  const [accessToken, setAccessToken] = useState('');
 
   useEffect(() => {
     const checkUserSession = async () => {
@@ -33,6 +35,19 @@ const App = () => {
           const userAccount = accounts[0];
           console.log("App.js: User Account Found:", userAccount);
 
+          const tokenResponse = await msalInstance.acquireTokenSilent({
+            account: userAccount,
+            scopes: ["https://graph.microsoft.com/.default"],
+          });
+
+          setAccessToken(tokenResponse.accessToken);
+
+          const groupIds = userAccount.idTokenClaims.groups || [];
+          console.log("App.js: User Groups (IDs):", groupIds);
+
+          const groupNames = await fetchGroupNames(groupIds, tokenResponse.accessToken);
+          console.log("App.js: User Groups (Names):", groupNames);
+          
           // Extract user details
           setUserName(userAccount.name || "User");
           setUserRole(userAccount.idTokenClaims?.groups || []);
