@@ -47,9 +47,8 @@ const HomePage = ({ userRole, userCustomId }) => {
   const [msalInstance, setMsalInstance] = useState(null);
 
   useEffect(() => {
-    const initializeMsal = async () => {
+    const initializeMsal = () => {
       const newMsalInstance = new PublicClientApplication(msalConfig);
-      await newMsalInstance.initialize(msalConfig);
       setMsalInstance(newMsalInstance);
     };
 
@@ -62,18 +61,26 @@ const HomePage = ({ userRole, userCustomId }) => {
       if (!msalInstance) return;
 
       try {
-        const token = (await msalInstance.acquireTokenSilent({
-          scopes: ["api://your_api_app_id/access_as_user"] // Replace with your API's app ID URI
-        })).accessToken;
+        // Ensure active account is set before making API requests
+        const account = msalInstance.getAllAccounts()[0];
+        if (account) {
+          msalInstance.setActiveAccount(account);
 
-        console.log('Fetched access token for group API:', token);
+          const token = (await msalInstance.acquireTokenSilent({
+            scopes: ["api://your_api_app_id/access_as_user"] // Replace with your API's app ID URI
+          })).accessToken;
 
-        const groupIds = userRole.filter(role => role.includes('Group')).map(role => role.split('-')[1]); // Assuming group IDs are in the role string (e.g., Group-123)
-        console.log('Group IDs:', groupIds);
+          console.log('Fetched access token for group API:', token);
 
-        const groupNamesFetched = await fetchGroupNames(groupIds, token);
-        console.log('Fetched group names:', groupNamesFetched);
-        setGroupNames(groupNamesFetched);
+          const groupIds = userRole.filter(role => role.includes('Group')).map(role => role.split('-')[1]); // Assuming group IDs are in the role string (e.g., Group-123)
+          console.log('Group IDs:', groupIds);
+
+          const groupNamesFetched = await fetchGroupNames(groupIds, token);
+          console.log('Fetched group names:', groupNamesFetched);
+          setGroupNames(groupNamesFetched);
+        } else {
+          console.log('No active account found');
+        }
       } catch (error) {
         console.error('Error fetching group names:', error);
       }
@@ -84,7 +91,7 @@ const HomePage = ({ userRole, userCustomId }) => {
 
   // Effect for fetching instructors (only for Admin users)
   useEffect(() => {
-    if (isAdmin) {
+    if (isAdmin && msalInstance) {
       const fetchInstructors = async () => {
         setLoadingInstructors(true);
         try {
@@ -119,7 +126,7 @@ const HomePage = ({ userRole, userCustomId }) => {
 
       fetchInstructors();
     }
-  }, [isAdmin]);
+  }, [isAdmin, msalInstance]);
 
   // Effect for fetching students (only for Instructor users)
   useEffect(() => {
