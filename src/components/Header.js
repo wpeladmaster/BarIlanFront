@@ -1,87 +1,91 @@
-import React, { useState, useEffect } from 'react'; // Import useState hook
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import '../style/Header.scss'; // Adjust your styles accordingly
+import '../style/Header.scss';
 import { PublicClientApplication } from '@azure/msal-browser';
 
+const msalConfig = {
+  auth: {
+    clientId: 'aadb3f2f-d35f-4080-bc72-2ee32b741120',
+    authority: 'https://login.microsoftonline.com/352ed1fa-2f18-487f-a4cf-4804faa235c7',
+    redirectUri: 'https://main.d3u5rxv1b6pn2o.amplifyapp.com',
+  },
+};
 
-const Header = ({ setMsalInstance, isAuthenticated, onLogout, setUserRole }) => {
-  const [isAuthenticatedState, setIsAuthenticated] = useState(false);
-  const [userName, setUserName] = useState('');
+const msalInstance = new PublicClientApplication(msalConfig);
 
-  // Move MSAL configuration outside the component
-  const msalConfig = {
-    auth: {
-      clientId: "aadb3f2f-d35f-4080-bc72-2ee32b741120",
-      authority: "https://login.microsoftonline.com/352ed1fa-2f18-487f-a4cf-4804faa235c7/saml2",
-      redirectUri: "https://main.d3u5rxv1b6pn2o.amplifyapp.com"
-    }
-  };
+const Header = ({ setIsAuthenticated, setUserName, setUserRole, setUserCustomId }) => {
+  useEffect(() => {
+    const checkUserSession = async () => {
+      try {
+        const accounts = msalInstance.getAllAccounts();
+        const userAccount = accounts[0];
 
-  //const [msalInstance, setMsalInstance] = useState(null);
+        if (userAccount) {
+          const claims = userAccount.idTokenClaims;
+          setUserName(userAccount.name);
+          setUserRole(claims.groups || []);
+          setUserCustomId(claims.extension_CustomID || ''); // Example of custom claim
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (err) {
+        console.error('Session Check Error:', err);
+        setIsAuthenticated(false);
+      }
+    };
 
-  // useEffect(() => {
-  //   const initializeMsal = async () => {
-  //     const newMsalInstance = new PublicClientApplication(msalConfig);
-  //     await newMsalInstance.initialize(msalConfig);
-  //     setMsalInstance(newMsalInstance);
-  //   };
+    checkUserSession();
+  }, [setIsAuthenticated, setUserName, setUserRole, setUserCustomId]);
 
-  //   initializeMsal();
-  // }, []);
-
-  console.log('msalInstance:', setMsalInstance);
-
-  // Pass MSAL instance as a prop (assuming initialization happens elsewhere)
-  const handleLogin = async (setMsalInstance) => {
+  const handleLogin = async () => {
     try {
-      const loginResponse = await setMsalInstance.loginPopup({
-        scopes: ["user.read"] // Add necessary scopes
+      const loginResponse = await msalInstance.loginPopup({
+        scopes: ['user.read', 'openid', 'profile'], // Add required scopes
       });
-
-      console.error('loginResponse:', loginResponse);
-
-      setUserName(loginResponse.name);
-      setUserRole(loginResponse.idTokenClaims.groups || []);
+      const claims = loginResponse.idTokenClaims;
+      setUserName(loginResponse.account.name);
+      setUserRole(claims.groups || []);
+      setUserCustomId(claims.extension_CustomID || '');
       setIsAuthenticated(true);
-      console.log('Iam logged in');
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login Error:', error);
     }
   };
 
-  const handleLogout = async (setMsalInstance) => {
+  const handleLogout = async () => {
     try {
-      setMsalInstance.logout();
-      onLogout();
+      await msalInstance.logoutPopup();
       setIsAuthenticated(false);
+      setUserName('');
+      setUserRole([]);
+      setUserCustomId('');
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Logout Error:', error);
     }
   };
 
   return (
     <header>
       <div className="auth-wrap">
-        {isAuthenticatedState ? (
-          <div className='inner'>
-            <button onClick={() => handleLogout(setMsalInstance)}>Logout</button>
-            <span>Welcome, {userName}</span>
+        {msalInstance.getAllAccounts().length > 0 ? (
+          <div className="inner">
+            <button onClick={handleLogout}>Logout</button>
           </div>
         ) : (
-          <div className='inner'>
-            <button onClick={() => handleLogin(setMsalInstance)}>Login</button>
+          <div className="inner">
+            <button onClick={handleLogin}>Login</button>
           </div>
         )}
       </div>
-      <div className='logo'>
-        <img src='../../images/bar-ilan-logo.png' alt='Logo' />
+      <div className="logo">
+        <img src="../../images/bar-ilan-logo.png" alt="Logo" />
       </div>
       <nav>
         <ul>
-          <li><Link to="/">Home</Link></li>
-          {/* {userRole && userRole.includes('Admins') && (
-            <li><Link to="/admin-search">Admin Search</Link></li>
-          )} */}
+          <li>
+            <Link to="/">Home</Link>
+          </li>
         </ul>
       </nav>
     </header>
