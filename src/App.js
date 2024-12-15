@@ -23,7 +23,7 @@ const App = () => {
         const accounts = instance.getAllAccounts();
         if (accounts.length > 0) {
           const userAccount = accounts[0];
-          console.log("App.js: User Account Found:", userAccount);
+          console.log("App.js: User Account Found:", userAccount);  // Log the whole userAccount
   
           const tokenResponse = await instance.acquireTokenSilent({
             account: userAccount,
@@ -33,16 +33,18 @@ const App = () => {
           setAccessToken(tokenResponse.accessToken);
   
           const groupIds = userAccount.idTokenClaims.groups || [];
-          console.log("App.js: User Groups (IDs):", groupIds);
+          console.log("App.js: User Groups (IDs):", groupIds);  // Log group IDs to see if groups exist
   
           const groupNames = await fetchGroupNames(groupIds, tokenResponse.accessToken);
-          console.log("App.js: User Groups (Names):", groupNames);
+          console.log("App.js: User Groups (Names):", groupNames);  // Log the group names fetched
   
+          // Log userAccount.name to verify if it exists
           setUserName(userAccount.name || "User");
           setUserRole(groupNames || []);
           setIsAuthenticated(true);
   
-          console.log("App.js: Authenticated:", true);
+          console.log("App.js: User Name:", userAccount.name);
+          console.log("App.js: User Role:", groupNames);
         }
       } catch (err) {
         console.error("App.js: Error checking session:", err);
@@ -54,8 +56,6 @@ const App = () => {
     checkUserSession();
   }, [instance]);
   
-  
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
