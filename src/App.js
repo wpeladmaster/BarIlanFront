@@ -1,110 +1,65 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
-import './style/global.scss';
-
-import Header from './components/Header';
-import Footer from './components/Footer';
-import Login from './components/Login';
-import HomePage from './components/HomePage';
-import AdminSearch from './components/AdminSearch';
-
-import fetchGroupNames from './utils/fetchGroupNames';
-import { loginRequest } from './authConfig';
 
 const App = () => {
-  const { instance } = useMsal(); // Access MSAL instance
+  const { instance, accounts } = useMsal();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState("");
   const [userRole, setUserRole] = useState([]);
-  const [accessToken, setAccessToken] = useState('');
-
-  const checkUserSession = async () => {
-    try {
-      console.log('App.js: Checking user session...');
-      const accounts = instance.getAllAccounts();
-
-      if (accounts.length === 0) {
-        console.warn('App.js: No accounts found. Triggering login...');
-        await instance.loginPopup(loginRequest);
-      }
-
-      const userAccount = instance.getAllAccounts()[0];
-      const tokenResponse = await instance.acquireTokenSilent({
-        account: userAccount,
-        scopes: loginRequest.scopes,
-      });
-
-      setAccessToken(tokenResponse.accessToken);
-      setUserName(userAccount.name || 'User');
-
-      const groupIds = userAccount.idTokenClaims.groups || [];
-      const groupNames = await fetchGroupNames(groupIds, tokenResponse.accessToken);
-
-      setUserRole(groupNames || []);
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.error('App.js: Error during session check:', error);
-      setIsAuthenticated(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [accessToken, setAccessToken] = useState("");
 
   useEffect(() => {
-    checkUserSession();
+    const checkSession = async () => {
+      try {
+        console.log("App.js: Checking user session...");
+        const activeAccounts = instance.getAllAccounts();
+        
+        if (!activeAccounts.length) {
+          console.log("App.js: No active accounts found.");
+          return;
+        }
+
+        const account = instance.getActiveAccount() || activeAccounts[0];
+        if (account) {
+          console.log("App.js: User account found:", account.username);
+          setIsAuthenticated(true);
+          setUserName(account.username);
+
+          // Acquire token silently
+          const tokenResponse = await instance.acquireTokenSilent({
+            scopes: ["user.read"],
+            account,
+          });
+
+          if (tokenResponse.accessToken) {
+            console.log("App.js: Access token acquired.");
+            setAccessToken(tokenResponse.accessToken);
+
+            // Example: Fetch roles from token
+            const roles = tokenResponse.idTokenClaims?.roles || [];
+            setUserRole(roles);
+          } else {
+            console.log("App.js: No access token available.");
+          }
+        } else {
+          console.log("App.js: No active account.");
+        }
+      } catch (error) {
+        console.error("App.js: Error during session check:", error);
+      }
+    };
+
+    checkSession();
   }, [instance]);
 
-  const handleLogout = async () => {
-    try {
-      console.log('App.js: Logging out...');
-      await instance.logoutPopup();
-      setIsAuthenticated(false);
-      setUserName('');
-      setUserRole([]);
-      setAccessToken('');
-    } catch (error) {
-      console.error('App.js: Logout error:', error);
-    }
-  };
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <Router>
-      <main>
-        <Header
-          isAuthenticated={isAuthenticated}
-          onLogout={handleLogout}
-          userName={userName}
-          userRole={userRole}
-        />
-        <Routes>
-          <Route
-            path="/"
-            element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />}
-          />
-          <Route
-            path="/homepage"
-            element={isAuthenticated ? <HomePage userRole={userRole} /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/admin-search"
-            element={
-              isAuthenticated && userRole.includes('Admins') ? (
-                <AdminSearch />
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-        </Routes>
-        <Footer />
-      </main>
-    </Router>
+    <div>
+      <h1>Welcome to the App</h1>
+      <p>Authenticated: {isAuthenticated ? "Yes" : "No"}</p>
+      <p>User: {userName}</p>
+      <p>Role: {userRole.join(", ")}</p>
+      <p>Access Token: {accessToken ? "Available" : "Not Available"}</p>
+    </div>
   );
 };
 
