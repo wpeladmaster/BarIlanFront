@@ -1,17 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../style/Header.scss';
+import { useMsal } from '@azure/msal-react';
 
-const Header = ({ msalInstance, isAuthenticated, onLogout, userName, userRole }) => {
-  // Debugging: Log msalInstance and state
+const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
+  const { instance: msalInstance } = useMsal();
+
   console.log("Header.js: Received msalInstance:", msalInstance);
-  console.log("Header.js: Authentication state:", isAuthenticated);
 
   const handleLogin = async () => {
     try {
       console.log("Header.js: Starting login...");
       const loginResponse = await msalInstance.loginPopup({
-        scopes: ["user.read"], // Add required scopes
+        scopes: ["user.read"],
       });
       console.log("Header.js: Login successful:", loginResponse);
 

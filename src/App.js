@@ -7,6 +7,7 @@ import Login from './components/Login';
 import HomePage from './components/HomePage';
 import AdminSearch from './components/AdminSearch';
 import { PublicClientApplication } from '@azure/msal-browser';
+import { MsalProvider } from '@azure/msal-react';
 
 const msalConfig = {
   auth: {
@@ -16,9 +17,7 @@ const msalConfig = {
   },
 };
 
-// Initialize MSAL instance once
 const msalInstance = new PublicClientApplication(msalConfig);
-console.log("MSAL Instance Initialized in App.js:", msalInstance);
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -27,26 +26,18 @@ const App = () => {
   const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
-    console.log("App.js: Running useEffect to check user session.");
     const checkUserSession = async () => {
       try {
-        console.log("App.js: Checking MSAL accounts...");
         const accounts = msalInstance.getAllAccounts();
-        console.log("App.js: Accounts found:", accounts);
-
         if (accounts.length > 0) {
           const userAccount = accounts[0];
-          const claims = userAccount.idTokenClaims;
-          console.log("App.js: User account and claims:", userAccount, claims);
-
           setUserName(userAccount.name);
-          setUserRole(claims.groups || []);
+          setUserRole(userAccount.idTokenClaims.groups || []);
           setIsAuthenticated(true);
         }
       } catch (err) {
         console.error("App.js: Error checking session:", err);
       } finally {
-        console.log("App.js: Finished checking session.");
         setIsLoading(false);
       }
     };
@@ -55,40 +46,40 @@ const App = () => {
   }, []);
 
   if (isLoading) {
-    console.log("App.js: Application is loading...");
     return <div>Loading...</div>;
   }
 
   return (
-    <Router>
-      <main>
-        <Header
-          msalInstance={msalInstance}
-          isAuthenticated={isAuthenticated}
-          onLogout={() => setIsAuthenticated(false)}
-          userName={userName}
-          userRole={userRole}
-        />
-        <Routes>
-          <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
-          <Route
-            path="/homepage"
-            element={isAuthenticated ? <HomePage userRole={userRole} /> : <Navigate to="/" />}
+    <MsalProvider instance={msalInstance}>
+      <Router>
+        <main>
+          <Header
+            isAuthenticated={isAuthenticated}
+            onLogout={() => setIsAuthenticated(false)}
+            userName={userName}
+            userRole={userRole}
           />
-          <Route
-            path="/admin-search"
-            element={
-              isAuthenticated && userRole.includes('Admins') ? (
-                <AdminSearch />
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-        </Routes>
-        <Footer />
-      </main>
-    </Router>
+          <Routes>
+            <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
+            <Route
+              path="/homepage"
+              element={isAuthenticated ? <HomePage userRole={userRole} /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/admin-search"
+              element={
+                isAuthenticated && userRole.includes('Admins') ? (
+                  <AdminSearch />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
+          </Routes>
+          <Footer />
+        </main>
+      </Router>
+    </MsalProvider>
   );
 };
 
