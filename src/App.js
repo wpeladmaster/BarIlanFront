@@ -7,20 +7,10 @@ import Login from './components/Login';
 import HomePage from './components/HomePage';
 import AdminSearch from './components/AdminSearch';
 import fetchGroupNames from './utils/fetchGroupNames';
-import { PublicClientApplication } from '@azure/msal-browser';
-import { MsalProvider } from '@azure/msal-react';
-
-const msalConfig = {
-  auth: {
-    clientId: "aadb3f2f-d35f-4080-bc72-2ee32b741120",
-    authority: "https://login.microsoftonline.com/352ed1fa-2f18-487f-a4cf-4804faa235c7",
-    redirectUri: "https://main.d3u5rxv1b6pn2o.amplifyapp.com",
-  },
-};
-
-const msalInstance = new PublicClientApplication(msalConfig);
+import { useMsal } from '@azure/msal-react';
 
 const App = () => {
+  const { instance } = useMsal(); // Access msalInstance from the provider
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
@@ -30,12 +20,12 @@ const App = () => {
   useEffect(() => {
     const checkUserSession = async () => {
       try {
-        const accounts = msalInstance.getAllAccounts();
+        const accounts = instance.getAllAccounts();
         if (accounts.length > 0) {
           const userAccount = accounts[0];
           console.log("App.js: User Account Found:", userAccount);
 
-          const tokenResponse = await msalInstance.acquireTokenSilent({
+          const tokenResponse = await instance.acquireTokenSilent({
             account: userAccount,
             scopes: ["https://graph.microsoft.com/.default"],
           });
@@ -47,10 +37,10 @@ const App = () => {
 
           const groupNames = await fetchGroupNames(groupIds, tokenResponse.accessToken);
           console.log("App.js: User Groups (Names):", groupNames);
-          
+
           // Extract user details
           setUserName(userAccount.name || "User");
-          setUserRole(userAccount.idTokenClaims?.groups || []);
+          setUserRole(groupNames || []);
           setIsAuthenticated(true);
         }
       } catch (err) {
@@ -61,47 +51,45 @@ const App = () => {
     };
 
     checkUserSession();
-  }, []);
+  }, [instance]);
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <MsalProvider instance={msalInstance}>
-      <Router>
-        <main>
-          <Header
-            isAuthenticated={isAuthenticated}
-            onLogout={() => {
-              setIsAuthenticated(false);
-              setUserName('');
-              setUserRole([]);
-            }}
-            userName={userName}
-            userRole={userRole}
+    <Router>
+      <main>
+        <Header
+          isAuthenticated={isAuthenticated}
+          onLogout={() => {
+            setIsAuthenticated(false);
+            setUserName('');
+            setUserRole([]);
+          }}
+          userName={userName}
+          userRole={userRole}
+        />
+        <Routes>
+          <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
+          <Route
+            path="/homepage"
+            element={isAuthenticated ? <HomePage userRole={userRole} /> : <Navigate to="/" />}
           />
-          <Routes>
-            <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
-            <Route
-              path="/homepage"
-              element={isAuthenticated ? <HomePage userRole={userRole} /> : <Navigate to="/" />}
-            />
-            <Route
-              path="/admin-search"
-              element={
-                isAuthenticated && userRole.includes('Admins') ? (
-                  <AdminSearch />
-                ) : (
-                  <Navigate to="/" />
-                )
-              }
-            />
-          </Routes>
-          <Footer />
-        </main>
-      </Router>
-    </MsalProvider>
+          <Route
+            path="/admin-search"
+            element={
+              isAuthenticated && userRole.includes('Admins') ? (
+                <AdminSearch />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+        </Routes>
+        <Footer />
+      </main>
+    </Router>
   );
 };
 
