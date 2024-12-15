@@ -18,6 +18,7 @@ const msalConfig = {
 
 // Initialize MSAL instance once
 const msalInstance = new PublicClientApplication(msalConfig);
+console.log("MSAL Instance Initialized in App.js:", msalInstance);
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -26,20 +27,26 @@ const App = () => {
   const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
+    console.log("App.js: Running useEffect to check user session.");
     const checkUserSession = async () => {
       try {
+        console.log("App.js: Checking MSAL accounts...");
         const accounts = msalInstance.getAllAccounts();
+        console.log("App.js: Accounts found:", accounts);
+
         if (accounts.length > 0) {
           const userAccount = accounts[0];
           const claims = userAccount.idTokenClaims;
+          console.log("App.js: User account and claims:", userAccount, claims);
 
           setUserName(userAccount.name);
           setUserRole(claims.groups || []);
           setIsAuthenticated(true);
         }
       } catch (err) {
-        console.error("Error checking session:", err);
+        console.error("App.js: Error checking session:", err);
       } finally {
+        console.log("App.js: Finished checking session.");
         setIsLoading(false);
       }
     };
@@ -48,6 +55,7 @@ const App = () => {
   }, []);
 
   if (isLoading) {
+    console.log("App.js: Application is loading...");
     return <div>Loading...</div>;
   }
 

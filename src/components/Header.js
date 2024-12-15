@@ -3,30 +3,34 @@ import { Link } from 'react-router-dom';
 import '../style/Header.scss';
 
 const Header = ({ msalInstance, isAuthenticated, onLogout, userName, userRole }) => {
-  // Debugging: Log msalInstance and its state
-  console.log("MSAL Instance in Header:", msalInstance);
+  // Debugging: Log msalInstance and state
+  console.log("Header.js: Received msalInstance:", msalInstance);
+  console.log("Header.js: Authentication state:", isAuthenticated);
 
   const handleLogin = async () => {
     try {
+      console.log("Header.js: Starting login...");
       const loginResponse = await msalInstance.loginPopup({
         scopes: ["user.read"], // Add required scopes
       });
+      console.log("Header.js: Login successful:", loginResponse);
 
       const { name, idTokenClaims } = loginResponse.account;
       const roles = idTokenClaims.groups || [];
-
-      console.log("Login Successful:", name, roles);
+      console.log("Header.js: User details:", name, roles);
     } catch (error) {
-      console.error("Login Error:", error);
+      console.error("Header.js: Login Error:", error);
     }
   };
 
   const handleLogout = async () => {
     try {
+      console.log("Header.js: Logging out...");
       await msalInstance.logoutPopup();
       onLogout();
+      console.log("Header.js: Logout successful.");
     } catch (error) {
-      console.error("Logout Error:", error);
+      console.error("Header.js: Logout Error:", error);
     }
   };
 
