@@ -8,6 +8,7 @@ import HomePage from './components/HomePage';
 import AdminSearch from './components/AdminSearch';
 import fetchGroupNames from './utils/fetchGroupNames';
 import { useMsal } from '@azure/msal-react';
+import { loginRequest } from './authConfig';
 
 const App = () => {
   const { instance } = useMsal(); // Access msalInstance from the provider
@@ -20,53 +21,34 @@ const App = () => {
   useEffect(() => {
     const checkUserSession = async () => {
       console.log("App.js: Checking user session...");
-
+    
       try {
         const accounts = instance.getAllAccounts();
         console.log("App.js: Accounts found:", accounts);
-
-        if (accounts.length > 0) {
-          const userAccount = accounts[0];
-          console.log("App.js: User Account Found:", userAccount);
-
-          try {
-            const tokenResponse = await instance.acquireTokenSilent({
-              account: userAccount,
-              scopes: ["https://graph.microsoft.com/.default"],
-            });
-            console.log("App.js: Token Response:", tokenResponse);
-            setAccessToken(tokenResponse.accessToken);
-
-            const groupIds = userAccount.idTokenClaims.groups || [];
-            console.log("App.js: User Groups (IDs):", groupIds);
-
-            if (groupIds.length === 0) {
-              console.warn("App.js: No groups found for the user.");
-            }
-
-            const groupNames = await fetchGroupNames(groupIds, tokenResponse.accessToken);
-            console.log("App.js: User Groups (Names):", groupNames);
-
-            setUserName(userAccount.name || "User");
-            setUserRole(groupNames || []);
-            console.log("App.js: Updated userName:", userAccount.name);
-            console.log("App.js: Updated userRole:", groupNames);
-
-            setIsAuthenticated(true);
-          } catch (tokenError) {
-            console.error("App.js: Error acquiring token:", tokenError);
-            setIsAuthenticated(false);  // Ensure fallback on error
+    
+        if (accounts.length === 0) {
+          console.warn("App.js: No user accounts found, attempting login...");
+          const loginResponse = await instance.loginPopup(loginRequest);  // Pass the loginRequest object here
+          console.log("App.js: Login successful:", loginResponse);
+          const newAccounts = instance.getAllAccounts();
+          if (newAccounts.length > 0) {
+            console.log("App.js: New user account found:", newAccounts[0]);
+            // Continue your logic to acquire token and handle groups
           }
         } else {
-          console.warn("App.js: No user accounts found.");
+          const userAccount = accounts[0];
+          console.log("App.js: User Account Found:", userAccount);
+          // Your existing logic to acquire token and handle groups
         }
       } catch (err) {
         console.error("App.js: Error checking session:", err);
-        setIsAuthenticated(false);  // Ensure fallback on error
+        console.error("App.js: Error during login:", err);
+        setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
       }
     };
+    
 
     checkUserSession();
   }, [instance]);

@@ -5,8 +5,11 @@ export const msalConfig = {
         redirectUri: "https://main.d3u5rxv1b6pn2o.amplifyapp.com/homepage"
     },
     cache: {
-      cacheLocation: 'localStorage', // Cache location can be localStorage or sessionStorage
+      cacheLocation: 'sessionStorage', // Cache location can be localStorage or sessionStorage
       storeAuthStateInCookie: false,
     },
+  };
+  export const loginRequest = {
+    scopes: ["email","openid","profile", "User.Read", "User.ReadBasic.All", "GroupMember.Read.All"],
   };
   
