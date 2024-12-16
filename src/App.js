@@ -43,11 +43,18 @@ const App = ({ msalInstance }) => {
           setUserName(account.name || account.username);
           const email = account.username.split('@')[0];
   
+          const token = (await instance.acquireTokenSilent({
+            scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
+          })).accessToken;
+
           // Call AWS Lambda to fetch groups
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
           const response = await fetch(`${apiUrl}/fetchgroups`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+            headers: { 
+              Authorization: token,
+              'Content-Type': 'application/json',
+            },
             body: JSON.stringify({ email })
           });
   
@@ -81,12 +88,20 @@ const App = ({ msalInstance }) => {
       const email = loginResponse.account.username.split('@')[0];
   
       // Fetch groups after login
-      const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-      const response = await fetch(`${apiUrl}/fetchgroups`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
+        const token = (await instance.acquireTokenSilent({
+          scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
+        })).accessToken;
+        
+        // Call AWS Lambda to fetch groups
+        const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+        const response = await fetch(`${apiUrl}/fetchgroups`, {
+          method: 'POST',
+          headers: { 
+            Authorization: token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email })
+        });
   
       if (response.ok) {
         const data = await response.json();
