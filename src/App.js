@@ -44,7 +44,7 @@ const App = ({ msalInstance }) => {
           const email = account.username.split('@')[0];
   
           const token = (await instance.acquireTokenSilent({
-            scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
+            scopes: ["User.Read"],
           })).accessToken;
 
           // Call AWS Lambda to fetch groups
@@ -87,9 +87,8 @@ const App = ({ msalInstance }) => {
       setUserName(loginResponse.account.name || loginResponse.account.username);
       const email = loginResponse.account.username.split('@')[0];
   
-      // Fetch groups after login
         const token = (await instance.acquireTokenSilent({
-          scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
+          scopes: ["User.Read"],
         })).accessToken;
         
         // Call AWS Lambda to fetch groups

@@ -43,7 +43,7 @@ const HomePage = ({ userRole, userCustomId }) => {
 
     try {
       const token = (await instance.acquireTokenSilent({
-        scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
+        scopes: ["User.Read"],
       })).accessToken;
 
       const groupIds = userRole.filter(role => role.includes('Group')).map(role => role.split('-')[1]);
@@ -66,7 +66,7 @@ const HomePage = ({ userRole, userCustomId }) => {
         setLoadingInstructors(true);
         try {
           const token = (await instance.acquireTokenSilent({
-            scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
+            scopes: ["User.Read"],
           })).accessToken;
 
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
