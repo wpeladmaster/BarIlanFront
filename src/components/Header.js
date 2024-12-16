@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Header = ({ isAuthenticated, onLogout, userName }) => {
+const Header = ({ isAuthenticated, onLogout, onLogin, userName }) => {
   return (
     <header>
       <nav>
@@ -11,7 +11,7 @@ const Header = ({ isAuthenticated, onLogout, userName }) => {
           {isAuthenticated ? (
             <button onClick={onLogout}>Logout</button>
           ) : (
-            <button onClick={() => window.location.href = '/'}>Login</button>
+            <button onClick={onLogin}>Login</button>
           )}
         </div>
       </nav>

@@ -41,10 +41,18 @@ const App = ({ msalInstance }) => {
           setUserName(account.name || account.username);
           const email = account.username.split('@')[0];
 
+          const token = (await instance.acquireTokenSilent({
+            scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
+          })).accessToken;
+
           // Call AWS Lambda to fetch groups
-          const response = await fetch(`https://<API-GATEWAY-ENDPOINT>/fetchGroups`, {
+          const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+          const response = await fetch(`${apiUrl}/fetchgroups`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              Authorization: token,
+              'Content-Type': 'application/json',
+            },
             body: JSON.stringify({ email })
           });
 
@@ -65,6 +73,39 @@ const App = ({ msalInstance }) => {
 
     checkSession();
   }, [instance]);
+
+  const handleLogin = async () => {
+    try {
+      const loginResponse = await instance.loginPopup(loginRequest);
+      setIsAuthenticated(true);
+      setUserName(loginResponse.account.name || loginResponse.account.username);
+      const email = loginResponse.account.username.split('@')[0];
+      
+      const token = (await instance.acquireTokenSilent({
+        scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
+      })).accessToken;
+      // Fetch groups after login
+          const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+          const response = await fetch(`${apiUrl}/fetchgroups`, {
+            method: 'POST',
+            headers: {
+              Authorization: token,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email })
+          });
+
+      if (response.ok) {
+        const data = await response.json();
+        setGroupNames(data.groups);
+        setUserRole(data.groups);
+      } else {
+        throw new Error('Failed to fetch groups');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -90,6 +131,7 @@ const App = ({ msalInstance }) => {
       <main>
         <Header
           isAuthenticated={isAuthenticated}
+          onLogin={handleLogin}  // Pass the login handler to Header
           onLogout={handleLogout}
           userName={userName}
         />
