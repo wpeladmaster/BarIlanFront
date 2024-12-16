@@ -1,5 +1,5 @@
-// HomePage.js
 import React, { useState, useEffect, useMemo } from 'react';
+import { useMsal } from '@azure/msal-react'; // MSAL hook
 import InstructorsList from './lists/InstructorsList';
 import StudentsList from './lists/StudentsList';
 import PatientsList from './lists/PatientsList';
@@ -13,7 +13,8 @@ import CommandForm2 from './CommandForm2';
 import fetchGroupNames from '../utils/fetchGroupNames';
 import '../style/HomePage.scss';
 
-const HomePage = ({ msalInstance, userRole, userCustomId }) => {
+const HomePage = ({ userRole, userCustomId }) => {
+  const { instance, accounts } = useMsal(); // MSAL instance and account from context
   const [instructors, setInstructors] = useState([]);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -38,10 +39,10 @@ const HomePage = ({ msalInstance, userRole, userCustomId }) => {
   const isStudent = useMemo(() => userRole.includes('Students'), [userRole]);
 
   const fetchGroups = async () => {
-    if (!msalInstance) return;
+    if (!instance) return;
 
     try {
-      const token = (await msalInstance.acquireTokenSilent({
+      const token = (await instance.acquireTokenSilent({
         scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
       })).accessToken;
 
@@ -56,7 +57,7 @@ const HomePage = ({ msalInstance, userRole, userCustomId }) => {
 
   useEffect(() => {
     fetchGroups();
-  }, [msalInstance, userRole]);
+  }, [instance, userRole]);
 
   // Fetch instructors for admins
   useEffect(() => {
@@ -64,7 +65,7 @@ const HomePage = ({ msalInstance, userRole, userCustomId }) => {
       const fetchInstructors = async () => {
         setLoadingInstructors(true);
         try {
-          const token = (await msalInstance.acquireTokenSilent({
+          const token = (await instance.acquireTokenSilent({
             scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
           })).accessToken;
 
@@ -89,7 +90,7 @@ const HomePage = ({ msalInstance, userRole, userCustomId }) => {
 
       fetchInstructors();
     }
-  }, [isAdmin, msalInstance]);
+  }, [isAdmin, instance]);
 
   useEffect(() => {
     if (isInstructor && userCustomId) {
@@ -134,11 +135,28 @@ const HomePage = ({ msalInstance, userRole, userCustomId }) => {
     setSelectedSession(video.sessionName || '');
   };
 
+  const handleLogout = async () => {
+    try {
+      await instance.logoutPopup({
+        postLogoutRedirectUri: "/", // After logout, redirect to homepage
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (accounts.length > 0) {
+      setUserEmail(accounts[0].username); // Set user email from MSAL account info
+    }
+  }, [accounts]);
+
   return (
     <div className="main-container homepage">
       <div>
         <h2>User Email</h2>
         <p>{userEmail ? userEmail : "Fetching email..."}</p> {/* Display user's email */}
+        <button onClick={handleLogout}>Logout</button> {/* Logout button */}
       </div>
 
       <div>

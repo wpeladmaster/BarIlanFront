@@ -1,7 +1,7 @@
-// index.js
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { PublicClientApplication } from '@azure/msal-browser';
+import { MsalProvider } from '@azure/msal-react';
 import App from './App';
 
 const msalConfig = {
@@ -12,12 +12,14 @@ const msalConfig = {
   }
 };
 
-// Create an MSAL instance
+// Create the MSAL instance
 const msalInstance = new PublicClientApplication(msalConfig);
 
 ReactDOM.render(
   <React.StrictMode>
-    <App msalInstance={msalInstance} />
+    <MsalProvider instance={msalInstance}>
+      <App />
+    </MsalProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
