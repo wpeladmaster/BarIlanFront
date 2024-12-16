@@ -12,7 +12,7 @@ import fetchGroupNames from './utils/fetchGroupNames';
 import { loginRequest } from './authConfig';
 
 const App = () => {
-  const { instance: msalInstance, accounts } = useMsal();
+  const { instance: msalInstance } = useMsal();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
@@ -20,103 +20,126 @@ const App = () => {
   const [accessToken, setAccessToken] = useState('');
   const [groupNames, setGroupNames] = useState([]);
 
+  // Initialize session on app load
   useEffect(() => {
-    const checkSession = async () => {
+    const initializeSession = async () => {
       try {
-        console.log('App.js: Checking user session...');
-        const allAccounts = msalInstance.getAllAccounts();
-        if (!allAccounts.length) {
-          console.log('App.js: No active accounts found.');
+        const accounts = msalInstance.getAllAccounts();
+        if (!accounts.length) {
           setIsLoading(false);
           return;
         }
 
-        const account = msalInstance.getActiveAccount() || allAccounts[0];
-        msalInstance.setActiveAccount(account); // Set the active account
-        if (account) {
-          console.log('App.js: Account found:', account);
-          setIsAuthenticated(true);
-          setUserName(account.idTokenClaims.name);
+        const account = accounts[0];
+        msalInstance.setActiveAccount(account);
 
-          const tokenResponse = await msalInstance.acquireTokenSilent({
-            ...loginRequest,
-            account,
-          });
+        // Silent token acquisition
+        const tokenResponse = await msalInstance.acquireTokenSilent({
+          ...loginRequest,
+          account,
+        });
 
-          if (tokenResponse.accessToken) {
-            console.log('App.js: Access token acquired.');
-            setAccessToken(tokenResponse.accessToken);
-          }
+        setAccessToken(tokenResponse.accessToken);
+        setIsAuthenticated(true);
+        setUserName(account.idTokenClaims.name || 'User');
+        const roles = account.idTokenClaims?.groups || [];
+        setUserRole(roles);
 
-          const roles = account?.idTokenClaims?.groups || [];
-          console.log('App.js: User roles:', roles);
-          setUserRole(roles);
-
-          const groupNames = await fetchGroupNames(roles, tokenResponse.accessToken);
-          console.log('App.js: Group names fetched:', groupNames);
-          setGroupNames(groupNames);
-        }
+        // Fetch group names based on roles
+        const fetchedGroups = await fetchGroupNames(roles, tokenResponse.accessToken);
+        setGroupNames(fetchedGroups);
       } catch (error) {
-        console.error('App.js: Error during session check:', error);
+        console.error('Error initializing session:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkSession();
+    initializeSession();
   }, [msalInstance]);
 
+  // Handle login
+  const handleLogin = async () => {
+    try {
+      console.log('App.js: Initiating login...');
+      const loginResponse = await msalInstance.loginPopup(loginRequest); // Trigger login popup
+      msalInstance.setActiveAccount(loginResponse.account); // Set active account after login
+  
+      // Fetch access token silently
+      const tokenResponse = await msalInstance.acquireTokenSilent({
+        ...loginRequest,
+        account: loginResponse.account,
+      });
+  
+      if (tokenResponse.accessToken) {
+        console.log('App.js: Access token acquired during login.');
+        setAccessToken(tokenResponse.accessToken); // Update state with access token
+      }
+  
+      const roles = loginResponse.account.idTokenClaims?.groups || []; // Fetch user roles
+      setIsAuthenticated(true); // Update authentication state
+      setUserName(loginResponse.account.idTokenClaims.name); // Set user name
+      setUserRole(roles); // Set roles
+  
+      // Fetch and update group names for roles
+      const groupNames = await fetchGroupNames(roles, tokenResponse.accessToken);
+      setGroupNames(groupNames);
+    } catch (error) {
+      console.error('App.js: Error during login:', error);
+    }
+  };
+
+  // Handle logout
   const handleLogout = async () => {
     try {
-      console.log('App.js: Logging out...');
       await msalInstance.logoutPopup();
       setIsAuthenticated(false);
       setUserName('');
       setUserRole([]);
       setAccessToken('');
       setGroupNames([]);
-      console.log('App.js: Logout successful, state cleared.');
     } catch (error) {
-      console.error('App.js: Logout error:', error);
+      console.error('Error during logout:', error);
     }
   };
 
-  if (isLoading) {
-    console.log('App.js: Loading state is active.');
-    return <div>Loading...</div>;
-  }
+  if (isLoading) return <div className="loading-screen">Loading...</div>;
 
   return (
     <Router>
+      <Header
+        isAuthenticated={isAuthenticated}
+        userName={userName}
+        userRole={userRole}
+        onLogin={handleLogin}
+        onLogout={handleLogout}
+      />
       <main>
-        <Header
-          isAuthenticated={isAuthenticated}
-          onLogout={handleLogout}
-          userName={userName}
-          userRole={userRole}
-        />
         <Routes>
           <Route
             path="/"
-            element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />}
+            element={isAuthenticated ? <Navigate to="/homepage" replace /> : <Login onLogin={handleLogin} />}
           />
           <Route
             path="/homepage"
-            element={isAuthenticated ? <HomePage userRole={userRole} groupNames={groupNames} /> : <Navigate to="/" />}
+            element={isAuthenticated ? (
+              <HomePage userRole={userRole} groupNames={groupNames} />
+            ) : (
+              <Navigate to="/" replace />
+            )}
           />
           <Route
             path="/admin-search"
-            element={
-              isAuthenticated && userRole.includes('Admins') ? (
-                <AdminSearch groupNames={groupNames} />
-              ) : (
-                <Navigate to="/" />
-              )
-            }
+            element={isAuthenticated && userRole.includes('Admins') ? (
+              <AdminSearch groupNames={groupNames} />
+            ) : (
+              <Navigate to="/" replace />
+            )}
           />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        <Footer />
       </main>
+      <Footer />
     </Router>
   );
 };
