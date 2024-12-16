@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import './style/global.scss';
@@ -40,21 +39,19 @@ const App = ({ msalInstance }) => {
         if (account) {
           setIsAuthenticated(true);
           setUserName(account.name || account.username);
-          const email = account.username.split('@')[0]; // Extract username before '@'
+          const email = account.username.split('@')[0];
 
-          // Call AWS Lambda function to fetch groups from DynamoDB based on the email
+          // Call AWS Lambda to fetch groups
           const response = await fetch(`https://<API-GATEWAY-ENDPOINT>/fetchGroups`, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email })
           });
 
           if (response.ok) {
             const data = await response.json();
-            setGroupNames(data.groups);  // Assuming the API returns an array of groups
-            setUserRole(data.groups);     // Set role from groups
+            setGroupNames(data.groups);
+            setUserRole(data.groups);
           } else {
             throw new Error('Failed to fetch groups');
           }
@@ -95,7 +92,6 @@ const App = ({ msalInstance }) => {
           isAuthenticated={isAuthenticated}
           onLogout={handleLogout}
           userName={userName}
-          userRole={userRole}
         />
         <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />

@@ -1,18 +1,20 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
-const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
+const Header = ({ isAuthenticated, onLogout, userName }) => {
   return (
     <header>
-      <div className="header-content">
-        <h1>Welcome, {userName}</h1>
-        <nav>
-          {isAuthenticated && userRole.includes('Admins') && (
-            <Link to="/admin-search">Admin Search</Link>
+      <nav>
+        <div>
+          <h1>Welcome, {isAuthenticated ? userName : 'Guest'}</h1>
+        </div>
+        <div>
+          {isAuthenticated ? (
+            <button onClick={onLogout}>Logout</button>
+          ) : (
+            <button onClick={() => window.location.href = '/'}>Login</button>
           )}
-          <button onClick={onLogout}>Logout</button>
-        </nav>
-      </div>
+        </div>
+      </nav>
     </header>
   );
 };
