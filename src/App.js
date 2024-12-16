@@ -37,6 +37,8 @@ const App = ({ msalInstance }) => {
         instance.setActiveAccount(account);
 
         if (account) {
+          console.log("account:", account);
+          
           setIsAuthenticated(true);
           setUserName(account.name || account.username);
           const email = account.username.split('@')[0];
@@ -44,6 +46,8 @@ const App = ({ msalInstance }) => {
           const token = (await instance.acquireTokenSilent({
             scopes: ["User.Read"],
           })).accessToken;
+
+          console.log("token:", token);
 
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
           const groups = await fetchGroupNames(apiUrl, token, email);
