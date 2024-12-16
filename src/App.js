@@ -25,13 +25,13 @@ const App = () => {
     const checkSession = async () => {
       try {
         console.log("App.js: Checking user session...");
-  
+
         // Ensure MSAL instance is initialized
         if (!instance) {
           console.error("App.js: MSAL instance is not initialized.");
           return;
         }
-  
+
         // Check if there are any active accounts
         const allAccounts = instance.getAllAccounts();
         if (!allAccounts.length) {
@@ -39,32 +39,31 @@ const App = () => {
           setIsLoading(false);
           return;
         }
-  
+
         const account = instance.getActiveAccount() || allAccounts[0];
         if (account) {
           console.log("App.js: Account found:", account);
           console.log("App.js: User account found:", account.idTokenClaims.name);
           setIsAuthenticated(true);
           setUserName(account.idTokenClaims.name);
-  
+
           // Fetch token silently
           const tokenResponse = await instance.acquireTokenSilent({
             scopes: ["user.read"],
             account,
           });
-  
+
           if (tokenResponse.accessToken) {
             console.log("App.js: Access token acquired.");
             setAccessToken(tokenResponse.accessToken);
           } else {
             console.log("App.js: No access token available.");
           }
-  
+
           const roles = account?.idTokenClaims?.groups || [];
           console.log("App.js: User roles:", roles);
-  
           setUserRole(roles);
-  
+
           // Fetch group names using group IDs from the roles (or modify this if needed)
           const groupNames = await fetchGroupNames(roles, tokenResponse.accessToken);
           console.log("App.js: Group names fetched:", groupNames);
@@ -78,10 +77,9 @@ const App = () => {
         setIsLoading(false);
       }
     };
-  
+
     checkSession();
   }, [instance]);
-  
 
   useEffect(() => {
     console.log("App.js: User Role Updated:", userRole); // Log user roles when updated
