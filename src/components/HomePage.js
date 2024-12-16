@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useMsal } from '@azure/msal-react'; // MSAL hook
-import InstructorsList from './lists/InstructorsList';
-import StudentsList from './lists/StudentsList';
-import PatientsList from './lists/PatientsList';
-import VideosList from './lists/VideosList';
-import useStudents from '../hooks/useStudents';
-import usePatients from '../hooks/usePatients';
-import useVideos from '../hooks/useVideos';
-import VideoModal from './VideoModal';
-import Loader from './Loader';
-import CommandForm2 from './CommandForm2';
-import fetchGroupNames from '../utils/fetchGroupNames';
-import '../style/HomePage.scss';
+import React, { useState, useEffect, useMemo } from "react";
+import { useMsal } from "@azure/msal-react"; // MSAL hook
+import InstructorsList from "./lists/InstructorsList";
+import StudentsList from "./lists/StudentsList";
+import PatientsList from "./lists/PatientsList";
+import VideosList from "./lists/VideosList";
+import useStudents from "../hooks/useStudents";
+import usePatients from "../hooks/usePatients";
+import useVideos from "../hooks/useVideos";
+import VideoModal from "./VideoModal";
+import Loader from "./Loader";
+import fetchGroupNames from "../utils/fetchGroupNames";
+import "../style/HomePage.scss";
 
 const HomePage = ({ userRole, userCustomId }) => {
   const { instance, accounts } = useMsal(); // MSAL instance and account from context
@@ -20,38 +19,39 @@ const HomePage = ({ userRole, userCustomId }) => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const [selectedSession, setSelectedSession] = useState(null);
-  const [activeTab, setActiveTab] = useState(null);
-  const [videoTimes, setVideoTimes] = useState({});
-  const [loadingInstructors, setLoadingInstructors] = useState(false);
-  const [loadingStudents, setLoadingStudents] = useState(false);
-  const [loadingPatients, setLoadingPatients] = useState(false);
-  const [loadingVideos, setLoadingVideos] = useState(false);
+  const [loading, setLoading] = useState(false); // Unified loader state
   const [groupNames, setGroupNames] = useState([]);
-  const [userEmail, setUserEmail] = useState(null); // State to store the user's email
+  const [userEmail, setUserEmail] = useState(null);
 
   const { students, fetchStudents } = useStudents();
   const { patients, fetchPatients } = usePatients();
-  const { videoList, fetchVideos, groupedVideos } = useVideos();
+  const { videoList, fetchVideos } = useVideos();
 
-  const isAdmin = useMemo(() => userRole.includes('Admins'), [userRole]);
-  const isInstructor = useMemo(() => userRole.includes('Instructors'), [userRole]);
-  const isStudent = useMemo(() => userRole.includes('Students'), [userRole]);
+  const isAdmin = useMemo(() => userRole.includes("Admins"), [userRole]);
+  const isInstructor = useMemo(() => userRole.includes("Instructors"), [userRole]);
+  const isStudent = useMemo(() => userRole.includes("Students"), [userRole]);
 
   const fetchGroups = async () => {
     if (!instance) return;
 
     try {
-      const token = (await instance.acquireTokenSilent({
-        scopes: ["User.Read"],
-      })).accessToken;
+      setLoading(true); // Start loader
+      const token = (
+        await instance.acquireTokenSilent({
+          scopes: ["User.Read"],
+        })
+      ).accessToken;
 
-      const groupIds = userRole.filter(role => role.includes('Group')).map(role => role.split('-')[1]);
+      const groupIds = userRole
+        .filter((role) => role.includes("Group"))
+        .map((role) => role.split("-")[1]);
+
       const groupNamesFetched = await fetchGroupNames(groupIds, token);
-      
       setGroupNames(groupNamesFetched);
     } catch (error) {
-      console.error('Error fetching group names:', error);
+      console.error("Error fetching group names:", error);
+    } finally {
+      setLoading(false); // Stop loader
     }
   };
 
@@ -63,28 +63,30 @@ const HomePage = ({ userRole, userCustomId }) => {
   useEffect(() => {
     if (isAdmin) {
       const fetchInstructors = async () => {
-        setLoadingInstructors(true);
+        setLoading(true);
         try {
-          const token = (await instance.acquireTokenSilent({
-            scopes: ["User.Read"],
-          })).accessToken;
+          const token = (
+            await instance.acquireTokenSilent({
+              scopes: ["User.Read"],
+            })
+          ).accessToken;
 
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
           const response = await fetch(`${apiUrl}/fetchinstructors`, {
-            method: 'GET',
+            method: "GET",
             headers: {
               Authorization: token,
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
           });
 
-          if (!response.ok) throw new Error('Failed to fetch instructors');
+          if (!response.ok) throw new Error("Failed to fetch instructors");
           const data = await response.json();
           setInstructors(data.unique_instructors_codes || []);
         } catch (error) {
-          console.error('Error fetching instructors:', error);
+          console.error("Error fetching instructors:", error);
         } finally {
-          setLoadingInstructors(false);
+          setLoading(false);
         }
       };
 
@@ -92,56 +94,13 @@ const HomePage = ({ userRole, userCustomId }) => {
     }
   }, [isAdmin, instance]);
 
-  useEffect(() => {
-    if (isInstructor && userCustomId) {
-      setLoadingStudents(true);
-      fetchStudents(userCustomId);
-    }
-  }, [isInstructor, userCustomId]);
-
-  useEffect(() => {
-    if (isStudent && userCustomId) {
-      setLoadingPatients(true);
-      fetchPatients(userCustomId);
-    }
-  }, [isStudent, userCustomId]);
-
-  const handleInstructorClick = async (instructorCode) => {
-    setSelectedInstructor(instructorCode);
-    setSelectedStudent(null);
-    setSelectedPatient(null);
-    setLoadingStudents(true);
-    await fetchStudents(instructorCode);
-    setLoadingStudents(false);
-  };
-
-  const handleStudentClick = (studentCode) => {
-    setSelectedStudent(studentCode);
-    setSelectedPatient(null);
-    setSelectedVideo(null);
-    setLoadingPatients(true);
-    fetchPatients(studentCode).finally(() => setLoadingPatients(false));
-  };
-
-  const handlePatientClick = (patientCode) => {
-    setSelectedPatient(patientCode);
-    setSelectedVideo(null);
-    setLoadingVideos(true);
-    fetchVideos(patientCode).finally(() => setLoadingVideos(false));
-  };
-
-  const handleVideoClick = (video) => {
-    setSelectedVideo(video);
-    setSelectedSession(video.sessionName || '');
-  };
-
   const handleLogout = async () => {
     try {
       await instance.logoutPopup({
         postLogoutRedirectUri: "/", // After logout, redirect to homepage
       });
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     }
   };
 
@@ -155,8 +114,8 @@ const HomePage = ({ userRole, userCustomId }) => {
     <div className="main-container homepage">
       <div>
         <h2>User Email</h2>
-        <p>{userEmail ? userEmail : "Fetching email..."}</p> {/* Display user's email */}
-        <button onClick={handleLogout}>Logout</button> {/* Logout button */}
+        <p>{userEmail || "Fetching email..."}</p>
+        <button onClick={handleLogout}>Logout</button>
       </div>
 
       <div>
@@ -167,20 +126,18 @@ const HomePage = ({ userRole, userCustomId }) => {
               <li key={index}>{groupName}</li>
             ))}
           </ul>
+        ) : loading ? (
+          <p>Loading group names...</p>
         ) : (
           <p>No groups available</p>
         )}
       </div>
 
-      {/* Other components like InstructorsList, StudentsList, etc. */}
-      <InstructorsList instructors={instructors} onClick={handleInstructorClick} />
-      <StudentsList students={students} onClick={handleStudentClick} />
-      <PatientsList patients={patients} onClick={handlePatientClick} />
-      <VideosList videos={videoList} onClick={handleVideoClick} />
-
-      {loadingInstructors || loadingStudents || loadingPatients || loadingVideos ? <Loader /> : null}
-
-      {/* Show video modal if selected */}
+      <InstructorsList instructors={instructors} />
+      <StudentsList students={students} />
+      <PatientsList patients={patients} />
+      <VideosList videos={videoList} />
+      {loading && <Loader />}
       {selectedVideo && <VideoModal video={selectedVideo} />}
     </div>
   );

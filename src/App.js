@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import Login from './components/Login';
 import HomePage from './components/HomePage';
 import AdminSearch from './components/AdminSearch';
+import fetchGroupNames from './utils/fetchGroupNames'; // Import the utility function
 
 const App = ({ msalInstance }) => {
   const { instance } = useMsal();
@@ -14,12 +15,9 @@ const App = ({ msalInstance }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState([]);
-  const [accessToken, setAccessToken] = useState('');
   const [groupNames, setGroupNames] = useState([]);
 
-  const loginRequest = {
-    scopes: ["User.Read"]
-  };
+  const loginRequest = { scopes: ["User.Read"] };
 
   useEffect(() => {
     const checkSession = async () => {
@@ -28,43 +26,29 @@ const App = ({ msalInstance }) => {
           setIsLoading(false);
           return;
         }
-  
+
         const allAccounts = instance.getAllAccounts();
         if (!allAccounts.length) {
           setIsLoading(false);
           return;
         }
-  
+
         const account = instance.getActiveAccount() || allAccounts[0];
-        instance.setActiveAccount(account); // Ensure the active account is set
-  
+        instance.setActiveAccount(account);
+
         if (account) {
           setIsAuthenticated(true);
           setUserName(account.name || account.username);
           const email = account.username.split('@')[0];
-  
+
           const token = (await instance.acquireTokenSilent({
             scopes: ["User.Read"],
           })).accessToken;
 
-          // Call AWS Lambda to fetch groups
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-          const response = await fetch(`${apiUrl}/fetchgroups`, {
-            method: 'POST',
-            headers: { 
-              Authorization: token,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email })
-          });
-  
-          if (response.ok) {
-            const data = await response.json();
-            setGroupNames(data.groups);
-            setUserRole(data.groups);
-          } else {
-            throw new Error('Failed to fetch groups');
-          }
+          const groups = await fetchGroupNames(apiUrl, token, email);
+          setGroupNames(groups);
+          setUserRole(groups);
         }
       } catch (error) {
         console.error('Error during session check:', error);
@@ -72,48 +56,31 @@ const App = ({ msalInstance }) => {
         setIsLoading(false);
       }
     };
-  
+
     checkSession();
   }, [instance]);
-  
 
   const handleLogin = async () => {
     try {
       const loginResponse = await instance.loginPopup(loginRequest);
-      // Set the active account after successful login
       instance.setActiveAccount(loginResponse.account);
-      
+
       setIsAuthenticated(true);
       setUserName(loginResponse.account.name || loginResponse.account.username);
       const email = loginResponse.account.username.split('@')[0];
-  
-        const token = (await instance.acquireTokenSilent({
-          scopes: ["User.Read"],
-        })).accessToken;
-        
-        // Call AWS Lambda to fetch groups
-        const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-        const response = await fetch(`${apiUrl}/fetchgroups`, {
-          method: 'POST',
-          headers: { 
-            Authorization: token,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email })
-        });
-  
-      if (response.ok) {
-        const data = await response.json();
-        setGroupNames(data.groups);
-        setUserRole(data.groups);
-      } else {
-        throw new Error('Failed to fetch groups');
-      }
+
+      const token = (await instance.acquireTokenSilent({
+        scopes: ["User.Read"],
+      })).accessToken;
+
+      const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+      const groups = await fetchGroupNames(apiUrl, token, email);
+      setGroupNames(groups);
+      setUserRole(groups);
     } catch (error) {
       console.error('Login error:', error);
     }
   };
-  
 
   const handleLogout = async () => {
     try {
@@ -123,7 +90,6 @@ const App = ({ msalInstance }) => {
       setIsAuthenticated(false);
       setUserName('');
       setUserRole([]);
-      setAccessToken('');
       setGroupNames([]);
     } catch (error) {
       console.error('Logout error:', error);
@@ -139,13 +105,13 @@ const App = ({ msalInstance }) => {
       <main>
         <Header
           isAuthenticated={isAuthenticated}
-          onLogin={handleLogin}  // Pass the login handler to Header
+          onLogin={handleLogin}
           onLogout={handleLogout}
           userName={userName}
         />
         <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
-          <Route path="/homepage" element={isAuthenticated ? <HomePage msalInstance={msalInstance} userRole={userRole} groupNames={groupNames} /> : <Navigate to="/" />} />
+          <Route path="/homepage" element={isAuthenticated ? <HomePage userRole={userRole} groupNames={groupNames} /> : <Navigate to="/" />} />
           <Route path="/admin-search" element={isAuthenticated && userRole.includes('Admins') ? <AdminSearch groupNames={groupNames} /> : <Navigate to="/" />} />
         </Routes>
         <Footer />
