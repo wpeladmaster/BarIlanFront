@@ -61,6 +61,15 @@ const App = () => {
           }
 
           const roles = account?.idTokenClaims?.groups || [];
+
+          console.log("App.js1: account?.idTokenClaims:",  account?.idTokenClaims);
+          console.log("App.js2: account?.idTokenClaims?.groups:",  account?.idTokenClaims?.groups);
+
+          console.log("App.js3: account.idTokenClaims:",  account.idTokenClaims);
+          console.log("App.js4: account.idTokenClaims.groups:",  account.idTokenClaims.groups);
+
+
+
           console.log("App.js: User roles:", roles);
           setUserRole(roles);
 
