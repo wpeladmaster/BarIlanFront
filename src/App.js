@@ -30,13 +30,15 @@ const App = () => {
     }
   };
 
-  const initializeMsal = async () => {
-    const newMsalInstance = new PublicClientApplication(msalConfig);
-    await newMsalInstance.initialize();
-    setMsalInstance(newMsalInstance);
-  };
+  useEffect(() => {
+    const initializeMsal = async () => {
+      const newMsalInstance = new PublicClientApplication(msalConfig);
+      await newMsalInstance.initialize();
+      setMsalInstance(newMsalInstance);
+    };
 
-  initializeMsal();
+    initializeMsal();
+  }, []);
 
   useEffect(() => {
     const checkSession = async () => {
