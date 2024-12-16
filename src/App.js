@@ -28,34 +28,29 @@ const App = ({ msalInstance }) => {
           setIsLoading(false);
           return;
         }
-
+  
         const allAccounts = instance.getAllAccounts();
         if (!allAccounts.length) {
           setIsLoading(false);
           return;
         }
-
+  
         const account = instance.getActiveAccount() || allAccounts[0];
+        instance.setActiveAccount(account); // Ensure the active account is set
+  
         if (account) {
           setIsAuthenticated(true);
           setUserName(account.name || account.username);
           const email = account.username.split('@')[0];
-
-          const token = (await instance.acquireTokenSilent({
-            scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
-          })).accessToken;
-
+  
           // Call AWS Lambda to fetch groups
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
           const response = await fetch(`${apiUrl}/fetchgroups`, {
-            method: 'POST',
-            headers: {
-              Authorization: token,
-              'Content-Type': 'application/json',
-            },
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email })
           });
-
+  
           if (response.ok) {
             const data = await response.json();
             setGroupNames(data.groups);
@@ -70,31 +65,29 @@ const App = ({ msalInstance }) => {
         setIsLoading(false);
       }
     };
-
+  
     checkSession();
   }, [instance]);
+  
 
   const handleLogin = async () => {
     try {
       const loginResponse = await instance.loginPopup(loginRequest);
+      // Set the active account after successful login
+      instance.setActiveAccount(loginResponse.account);
+      
       setIsAuthenticated(true);
       setUserName(loginResponse.account.name || loginResponse.account.username);
       const email = loginResponse.account.username.split('@')[0];
-      
-      const token = (await instance.acquireTokenSilent({
-        scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
-      })).accessToken;
+  
       // Fetch groups after login
-          const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-          const response = await fetch(`${apiUrl}/fetchgroups`, {
-            method: 'POST',
-            headers: {
-              Authorization: token,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email })
-          });
-
+      const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+      const response = await fetch(`${apiUrl}/fetchgroups`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+  
       if (response.ok) {
         const data = await response.json();
         setGroupNames(data.groups);
@@ -106,6 +99,7 @@ const App = ({ msalInstance }) => {
       console.error('Login error:', error);
     }
   };
+  
 
   const handleLogout = async () => {
     try {
