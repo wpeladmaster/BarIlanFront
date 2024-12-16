@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { PublicClientApplication } from '@azure/msal-browser';
+//import { PublicClientApplication } from '@azure/msal-browser';
 import InstructorsList from './lists/InstructorsList';
 import StudentsList from './lists/StudentsList';
 import PatientsList from './lists/PatientsList';

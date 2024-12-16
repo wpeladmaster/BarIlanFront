@@ -12,7 +12,7 @@ import fetchGroupNames from './utils/fetchGroupNames';
 import { loginRequest } from './authConfig';
 
 const App = () => {
-  const { instance: msalInstance, accounts } = useMsal();
+  const { instance: msalInstance, accounts } = useMsal(); // Use MSAL instance provided by MsalProvider
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
@@ -20,42 +20,40 @@ const App = () => {
   const [accessToken, setAccessToken] = useState('');
   const [groupNames, setGroupNames] = useState([]);
 
+  console.log('MSAL instance initialized:', msalInstance);
+
+  
   useEffect(() => {
-    const checkSession = async () => {
+    const initializeSession = async () => {
       try {
         console.log('App.js: Checking user session...');
-        const allAccounts = msalInstance.getAllAccounts();
-        if (!allAccounts.length) {
+        const accounts = msalInstance.getAllAccounts();
+        if (!accounts.length) {
           console.log('App.js: No active accounts found.');
           setIsLoading(false);
           return;
         }
 
-        const account = msalInstance.getActiveAccount() || allAccounts[0];
-        msalInstance.setActiveAccount(account); // Set the active account
-        if (account) {
-          console.log('App.js: Account found:', account);
-          setIsAuthenticated(true);
-          setUserName(account.idTokenClaims.name);
+        const account = msalInstance.getActiveAccount() || accounts[0];
+        msalInstance.setActiveAccount(account);
 
-          const tokenResponse = await msalInstance.acquireTokenSilent({
-            ...loginRequest,
-            account,
-          });
+        const tokenResponse = await msalInstance.acquireTokenSilent({
+          ...loginRequest,
+          account,
+        });
 
-          if (tokenResponse.accessToken) {
-            console.log('App.js: Access token acquired.');
-            setAccessToken(tokenResponse.accessToken);
-          }
-
-          const roles = account?.idTokenClaims?.groups || [];
-          console.log('App.js: User roles:', roles);
-          setUserRole(roles);
-
-          const groupNames = await fetchGroupNames(roles, tokenResponse.accessToken);
-          console.log('App.js: Group names fetched:', groupNames);
-          setGroupNames(groupNames);
+        if (tokenResponse.accessToken) {
+          console.log('App.js: Access token acquired.');
+          setAccessToken(tokenResponse.accessToken);
         }
+
+        const roles = account.idTokenClaims?.groups || [];
+        setIsAuthenticated(true);
+        setUserName(account.idTokenClaims.name);
+        setUserRole(roles);
+
+        const groupNames = await fetchGroupNames(roles, tokenResponse.accessToken);
+        setGroupNames(groupNames);
       } catch (error) {
         console.error('App.js: Error during session check:', error);
       } finally {
@@ -63,60 +61,43 @@ const App = () => {
       }
     };
 
-    checkSession();
+    initializeSession();
   }, [msalInstance]);
 
   const handleLogout = async () => {
-    try {
-      console.log('App.js: Logging out...');
-      await msalInstance.logoutPopup();
-      setIsAuthenticated(false);
-      setUserName('');
-      setUserRole([]);
-      setAccessToken('');
-      setGroupNames([]);
-      console.log('App.js: Logout successful, state cleared.');
-    } catch (error) {
-      console.error('App.js: Logout error:', error);
-    }
+    await msalInstance.logoutPopup();
+    setIsAuthenticated(false);
+    setUserName('');
+    setUserRole([]);
+    setAccessToken('');
+    setGroupNames([]);
   };
 
   if (isLoading) {
-    console.log('App.js: Loading state is active.');
     return <div>Loading...</div>;
   }
 
   return (
     <Router>
-      <main>
-        <Header
-          isAuthenticated={isAuthenticated}
-          onLogout={handleLogout}
-          userName={userName}
-          userRole={userRole}
+      <Header isAuthenticated={isAuthenticated} userName={userName} onLogout={handleLogout} />
+      <Routes>
+        <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
+        <Route
+          path="/homepage"
+          element={isAuthenticated ? <HomePage userRole={userRole} groupNames={groupNames} /> : <Navigate to="/" />}
         />
-        <Routes>
-          <Route
-            path="/"
-            element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />}
-          />
-          <Route
-            path="/homepage"
-            element={isAuthenticated ? <HomePage userRole={userRole} groupNames={groupNames} /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/admin-search"
-            element={
-              isAuthenticated && userRole.includes('Admins') ? (
-                <AdminSearch groupNames={groupNames} />
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-        </Routes>
-        <Footer />
-      </main>
+        <Route
+          path="/admin-search"
+          element={
+            isAuthenticated && userRole.includes('Admins') ? (
+              <AdminSearch groupNames={groupNames} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+      </Routes>
+      <Footer />
     </Router>
   );
 };

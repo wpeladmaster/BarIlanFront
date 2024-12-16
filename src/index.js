@@ -13,6 +13,7 @@ const msalConfig = {
 };
 
 const msalInstance = new PublicClientApplication(msalConfig);
+console.log('MSAL instance initialized:', msalInstance);
 
 ReactDOM.render(
   <MsalProvider instance={msalInstance}>
