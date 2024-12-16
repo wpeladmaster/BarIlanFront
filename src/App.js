@@ -12,7 +12,7 @@ import fetchGroupNames from './utils/fetchGroupNames';
 import { loginRequest } from './authConfig';
 
 const App = () => {
-  const { instance: msalInstance, accounts } = useMsal(); // Use MSAL instance provided by MsalProvider
+  const { instance: msalInstance, accounts } = useMsal(); // MSAL instance and accounts
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
@@ -20,9 +20,6 @@ const App = () => {
   const [accessToken, setAccessToken] = useState('');
   const [groupNames, setGroupNames] = useState([]);
 
-  console.log('MSAL instance initialized:', msalInstance);
-
-  
   useEffect(() => {
     const initializeSession = async () => {
       try {
@@ -64,6 +61,34 @@ const App = () => {
     initializeSession();
   }, [msalInstance]);
 
+  const handleLogin = async () => {
+    try {
+      console.log('App.js: Initiating login...');
+      const loginResponse = await msalInstance.loginPopup(loginRequest);
+      msalInstance.setActiveAccount(loginResponse.account);
+
+      const tokenResponse = await msalInstance.acquireTokenSilent({
+        ...loginRequest,
+        account: loginResponse.account,
+      });
+
+      if (tokenResponse.accessToken) {
+        console.log('App.js: Access token acquired during login.');
+        setAccessToken(tokenResponse.accessToken);
+      }
+
+      const roles = loginResponse.account.idTokenClaims?.groups || [];
+      setIsAuthenticated(true);
+      setUserName(loginResponse.account.idTokenClaims.name);
+      setUserRole(roles);
+
+      const groupNames = await fetchGroupNames(roles, tokenResponse.accessToken);
+      setGroupNames(groupNames);
+    } catch (error) {
+      console.error('App.js: Error during login:', error);
+    }
+  };
+
   const handleLogout = async () => {
     await msalInstance.logoutPopup();
     setIsAuthenticated(false);
@@ -74,29 +99,46 @@ const App = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="loading-screen">Loading...</div>;
   }
 
   return (
     <Router>
-      <Header isAuthenticated={isAuthenticated} userName={userName} onLogout={handleLogout} />
-      <Routes>
-        <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
-        <Route
-          path="/homepage"
-          element={isAuthenticated ? <HomePage userRole={userRole} groupNames={groupNames} /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/admin-search"
-          element={
-            isAuthenticated && userRole.includes('Admins') ? (
-              <AdminSearch groupNames={groupNames} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-      </Routes>
+      <Header
+        isAuthenticated={isAuthenticated}
+        userName={userName}
+        userRole={userRole}
+        onLogout={handleLogout}
+      />
+      <main>
+        <Routes>
+          <Route
+            path="/"
+            element={isAuthenticated ? <Navigate to="/homepage" replace /> : <Login onLogin={handleLogin} />}
+          />
+          <Route
+            path="/homepage"
+            element={
+              isAuthenticated ? (
+                <HomePage userRole={userRole} groupNames={groupNames} />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+          <Route
+            path="/admin-search"
+            element={
+              isAuthenticated && userRole.includes('Admins') ? (
+                <AdminSearch groupNames={groupNames} />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
       <Footer />
     </Router>
   );
