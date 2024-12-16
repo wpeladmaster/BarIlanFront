@@ -1,5 +1,5 @@
+// HomePage.js
 import React, { useState, useEffect, useMemo } from 'react';
-//import { PublicClientApplication } from '@azure/msal-browser';
 import InstructorsList from './lists/InstructorsList';
 import StudentsList from './lists/StudentsList';
 import PatientsList from './lists/PatientsList';
@@ -13,7 +13,7 @@ import CommandForm2 from './CommandForm2';
 import fetchGroupNames from '../utils/fetchGroupNames';
 import '../style/HomePage.scss';
 
-const HomePage = ({ userRole, userCustomId }) => {
+const HomePage = ({ msalInstance, userRole, userCustomId }) => {
   const [instructors, setInstructors] = useState([]);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -27,7 +27,7 @@ const HomePage = ({ userRole, userCustomId }) => {
   const [loadingPatients, setLoadingPatients] = useState(false);
   const [loadingVideos, setLoadingVideos] = useState(false);
   const [groupNames, setGroupNames] = useState([]);
-  const [msalInstance, setMsalInstance] = useState(null);
+  const [userEmail, setUserEmail] = useState(null); // State to store the user's email
 
   const { students, fetchStudents } = useStudents();
   const { patients, fetchPatients } = usePatients();
@@ -37,56 +37,28 @@ const HomePage = ({ userRole, userCustomId }) => {
   const isInstructor = useMemo(() => userRole.includes('Instructors'), [userRole]);
   const isStudent = useMemo(() => userRole.includes('Students'), [userRole]);
 
-  console.log("userRole: ", userRole);
+  const fetchGroups = async () => {
+    if (!msalInstance) return;
 
-  // const msalConfig = {
-  //   auth: {
-  //     clientId: "aadb3f2f-d35f-4080-bc72-2ee32b741120",
-  //     authority: "https://login.microsoftonline.com/352ed1fa-2f18-487f-a4cf-4804faa235c7/saml2",
-  //     redirectUri: "https://main.d3u5rxv1b6pn2o.amplifyapp.com/homepage"
-  //   }
-  // };
+    try {
+      const token = (await msalInstance.acquireTokenSilent({
+        scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
+      })).accessToken;
 
-  // useEffect(() => {
-  //   const initializeMsal = async () => {
-  //     const newMsalInstance = new PublicClientApplication(msalConfig);
-  //     await newMsalInstance.initialize();
-  //     setMsalInstance(newMsalInstance);
-  //   };
-
-  //   initializeMsal();
-  // }, []);
+      const groupIds = userRole.filter(role => role.includes('Group')).map(role => role.split('-')[1]);
+      const groupNamesFetched = await fetchGroupNames(groupIds, token);
+      
+      setGroupNames(groupNamesFetched);
+    } catch (error) {
+      console.error('Error fetching group names:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchGroups = async () => {
-      if (!msalInstance) return;
-
-      try {
-        const token = (await msalInstance.acquireTokenSilent({
-          scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
-        })).accessToken;
-
-        console.log("token: ", token);
-        
-        const groupIds = userRole.filter(role => role.includes('Group')).map(role => role.split('-')[1]);
-
-        console.log("groupIds: ", groupIds);
-
-        const groupNamesFetched = await fetchGroupNames(groupIds, token);
-
-        console.log("groupNamesFetched: ", groupNamesFetched);
-        
-        setGroupNames(groupNamesFetched);
-      } catch (error) {
-        console.error('Error fetching group names:', error);
-      }
-    };
-
-    if (msalInstance) {
-      fetchGroups();
-    }
+    fetchGroups();
   }, [msalInstance, userRole]);
 
+  // Fetch instructors for admins
   useEffect(() => {
     if (isAdmin) {
       const fetchInstructors = async () => {
@@ -133,15 +105,6 @@ const HomePage = ({ userRole, userCustomId }) => {
     }
   }, [isStudent, userCustomId]);
 
-  useEffect(() => {
-    if (selectedVideo && groupedVideos[selectedSession]) {
-      const sessionVideos = groupedVideos[selectedSession];
-      if (sessionVideos && sessionVideos.length) {
-        setActiveTab(sessionVideos[0].fullVideoName);
-      }
-    }
-  }, [selectedVideo, groupedVideos, selectedSession]);
-
   const handleInstructorClick = async (instructorCode) => {
     setSelectedInstructor(instructorCode);
     setSelectedStudent(null);
@@ -174,6 +137,11 @@ const HomePage = ({ userRole, userCustomId }) => {
   return (
     <div className="main-container homepage">
       <div>
+        <h2>User Email</h2>
+        <p>{userEmail ? userEmail : "Fetching email..."}</p> {/* Display user's email */}
+      </div>
+
+      <div>
         <h2>Group Names</h2>
         {groupNames.length > 0 ? (
           <ul>
@@ -186,8 +154,16 @@ const HomePage = ({ userRole, userCustomId }) => {
         )}
       </div>
 
-      {/* Other components and code remain the same */}
+      {/* Other components like InstructorsList, StudentsList, etc. */}
+      <InstructorsList instructors={instructors} onClick={handleInstructorClick} />
+      <StudentsList students={students} onClick={handleStudentClick} />
+      <PatientsList patients={patients} onClick={handlePatientClick} />
+      <VideosList videos={videoList} onClick={handleVideoClick} />
 
+      {loadingInstructors || loadingStudents || loadingPatients || loadingVideos ? <Loader /> : null}
+
+      {/* Show video modal if selected */}
+      {selectedVideo && <VideoModal video={selectedVideo} />}
     </div>
   );
 };
