@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import '../style/Header.scss';
 import { useMsal } from '@azure/msal-react';
 
-const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
+const Header = ({ isAuthenticated, onLogout, userName, userRole, onLogin }) => {
   console.log("Header.js: isAuthenticated:", isAuthenticated);
   console.log("Header.js: userName:", userName);
   console.log("Header.js: userRole:", userRole);
@@ -13,11 +13,11 @@ const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
   const handleLogin = async () => {
     try {
       console.log("Header.js: Starting login...");
-      await msalInstance.loginPopup({
+      const loginResponse = await msalInstance.loginPopup({
         scopes: ["user.read"],
       });
-      console.log("Header.js: Login successful.");
-      window.location.reload(); // Refresh to sync session state with App.js
+      console.log("Header.js: Login successful:", loginResponse.account);
+      onLogin(loginResponse.account); // Notify App.js to update session state
     } catch (error) {
       console.error("Header.js: Login Error:", error);
       alert("Login failed. Please try again.");
