@@ -37,6 +37,8 @@ const HomePage = ({ userRole, userCustomId }) => {
   const isInstructor = useMemo(() => userRole.includes('Instructors'), [userRole]);
   const isStudent = useMemo(() => userRole.includes('Students'), [userRole]);
 
+  console.log("userRole: ", userRole);
+
   const msalConfig = {
     auth: {
       clientId: "aadb3f2f-d35f-4080-bc72-2ee32b741120",
@@ -64,8 +66,16 @@ const HomePage = ({ userRole, userCustomId }) => {
           scopes: ["api://aadb3f2f-d35f-4080-bc72-2ee32b741120/access_as_user"]
         })).accessToken;
 
+        console.log("token: ", token);
+        
         const groupIds = userRole.filter(role => role.includes('Group')).map(role => role.split('-')[1]);
+
+        console.log("groupIds: ", groupIds);
+
         const groupNamesFetched = await fetchGroupNames(groupIds, token);
+
+        console.log("groupNamesFetched: ", groupNamesFetched);
+        
         setGroupNames(groupNamesFetched);
       } catch (error) {
         console.error('Error fetching group names:', error);
