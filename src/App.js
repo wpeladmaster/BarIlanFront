@@ -12,7 +12,7 @@ import fetchGroupNames from './utils/fetchGroupNames';
 import { loginRequest } from './authConfig';
 
 const App = () => {
-  const { instance: msalInstance, accounts } = useMsal(); // MSAL instance and accounts
+  const { instance: msalInstance } = useMsal();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
@@ -23,15 +23,13 @@ const App = () => {
   useEffect(() => {
     const initializeSession = async () => {
       try {
-        console.log('App.js: Checking user session...');
         const accounts = msalInstance.getAllAccounts();
         if (!accounts.length) {
-          console.log('App.js: No active accounts found.');
           setIsLoading(false);
           return;
         }
 
-        const account = msalInstance.getActiveAccount() || accounts[0];
+        const account = accounts[0];
         msalInstance.setActiveAccount(account);
 
         const tokenResponse = await msalInstance.acquireTokenSilent({
@@ -39,20 +37,16 @@ const App = () => {
           account,
         });
 
-        if (tokenResponse.accessToken) {
-          console.log('App.js: Access token acquired.');
-          setAccessToken(tokenResponse.accessToken);
-        }
-
-        const roles = account.idTokenClaims?.groups || [];
+        setAccessToken(tokenResponse.accessToken);
         setIsAuthenticated(true);
-        setUserName(account.idTokenClaims.name);
+        setUserName(account.idTokenClaims.name || 'User');
+        const roles = account.idTokenClaims?.groups || [];
         setUserRole(roles);
 
-        const groupNames = await fetchGroupNames(roles, tokenResponse.accessToken);
-        setGroupNames(groupNames);
+        const fetchedGroups = await fetchGroupNames(roles, tokenResponse.accessToken);
+        setGroupNames(fetchedGroups);
       } catch (error) {
-        console.error('App.js: Error during session check:', error);
+        console.error('Error initializing session:', error);
       } finally {
         setIsLoading(false);
       }
@@ -63,7 +57,6 @@ const App = () => {
 
   const handleLogin = async () => {
     try {
-      console.log('App.js: Initiating login...');
       const loginResponse = await msalInstance.loginPopup(loginRequest);
       msalInstance.setActiveAccount(loginResponse.account);
 
@@ -72,35 +65,33 @@ const App = () => {
         account: loginResponse.account,
       });
 
-      if (tokenResponse.accessToken) {
-        console.log('App.js: Access token acquired during login.');
-        setAccessToken(tokenResponse.accessToken);
-      }
-
-      const roles = loginResponse.account.idTokenClaims?.groups || [];
+      setAccessToken(tokenResponse.accessToken);
       setIsAuthenticated(true);
-      setUserName(loginResponse.account.idTokenClaims.name);
+      setUserName(loginResponse.account.idTokenClaims.name || 'User');
+      const roles = loginResponse.account.idTokenClaims?.groups || [];
       setUserRole(roles);
 
-      const groupNames = await fetchGroupNames(roles, tokenResponse.accessToken);
-      setGroupNames(groupNames);
+      const fetchedGroups = await fetchGroupNames(roles, tokenResponse.accessToken);
+      setGroupNames(fetchedGroups);
     } catch (error) {
-      console.error('App.js: Error during login:', error);
+      console.error('Error during login:', error);
     }
   };
 
   const handleLogout = async () => {
-    await msalInstance.logoutPopup();
-    setIsAuthenticated(false);
-    setUserName('');
-    setUserRole([]);
-    setAccessToken('');
-    setGroupNames([]);
+    try {
+      await msalInstance.logoutPopup();
+      setIsAuthenticated(false);
+      setUserName('');
+      setUserRole([]);
+      setAccessToken('');
+      setGroupNames([]);
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
-  if (isLoading) {
-    return <div className="loading-screen">Loading...</div>;
-  }
+  if (isLoading) return <div className="loading-screen">Loading...</div>;
 
   return (
     <Router>
