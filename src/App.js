@@ -19,7 +19,7 @@ const App = () => {
   const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState([]);
   const [accessToken, setAccessToken] = useState('');
-  const [groupNames, setGroupNames] = useState([]); // State to store fetched group names
+  const [groupNames, setGroupNames] = useState([]);
   const [msalInstance, setMsalInstance] = useState(null);
 
   const msalConfig = {
@@ -32,9 +32,13 @@ const App = () => {
 
   useEffect(() => {
     const initializeMsal = async () => {
-      const newMsalInstance = new PublicClientApplication(msalConfig);
-      await newMsalInstance.initialize();
-      setMsalInstance(newMsalInstance);
+      try {
+        console.log("Initializing MSAL...");
+        const newMsalInstance = new PublicClientApplication(msalConfig);
+        setMsalInstance(newMsalInstance);
+      } catch (error) {
+        console.error("Error initializing MSAL:", error);
+      }
     };
 
     initializeMsal();
@@ -43,96 +47,63 @@ const App = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        console.log("App.js: Checking user session...");
-
-        // Ensure MSAL instance is initialized
-        if (!instance) {
-          console.error("App.js: MSAL instance is not initialized.");
+        if (!msalInstance) {
+          console.log("MSAL instance not initialized yet.");
           return;
         }
 
-        // Check if there are any active accounts
-        const allAccounts = instance.getAllAccounts();
+        const allAccounts = msalInstance.getAllAccounts();
         if (!allAccounts.length) {
-          console.log("App.js: No active accounts found.");
+          console.log("No active accounts found.");
           setIsLoading(false);
           return;
         }
 
-        const account = instance.getActiveAccount() || allAccounts[0];
+        const account = msalInstance.getActiveAccount() || allAccounts[0];
         if (account) {
-          console.log("App.js: Account found:", account);
-          console.log("App.js: User account found:", account.idTokenClaims.name);
           setIsAuthenticated(true);
           setUserName(account.idTokenClaims.name);
 
-          // Fetch token silently
-          const tokenResponse = await instance.acquireTokenSilent({
+          const tokenResponse = await msalInstance.acquireTokenSilent({
             scopes: ["user.read"],
             account,
           });
 
-          console.log("App.js: tokenResponse", tokenResponse);
-
           if (tokenResponse.accessToken) {
-            console.log("App.js: Access token acquired.");
             setAccessToken(tokenResponse.accessToken);
-          } else {
-            console.log("App.js: No access token available.");
           }
 
           const roles = account?.idTokenClaims?.groups || [];
-
-          console.log("App.js1: account?.idTokenClaims:",  account?.idTokenClaims);
-          console.log("App.js2: account?.idTokenClaims?.groups:",  account?.idTokenClaims?.groups);
-
-          console.log("App.js3: account.idTokenClaims:",  account.idTokenClaims);
-          console.log("App.js4: account.idTokenClaims.groups:",  account.idTokenClaims.groups);
-
-
-
-          console.log("App.js: User roles:", roles);
           setUserRole(roles);
 
-          // Fetch group names using group IDs from the roles (or modify this if needed)
           const groupNames = await fetchGroupNames(roles, tokenResponse.accessToken);
-          console.log("App.js: Group names fetched:", groupNames);
           setGroupNames(groupNames);
-        } else {
-          console.log("App.js: No active account.");
         }
       } catch (error) {
-        console.error("App.js: Error during session check:", error);
+        console.error("Error during session check:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     checkSession();
-  }, [instance]);
-
-  useEffect(() => {
-    console.log("App.js: User Role Updated:", userRole); // Log user roles when updated
-    console.log("App.js: Group Names Updated:", groupNames); // Log group names when updated
-  }, [userRole, groupNames]);
+  }, [msalInstance]);
 
   const handleLogout = async () => {
+    if (!msalInstance) return;
     try {
-      console.log('App.js: Logging out...');
-      await instance.logoutPopup();
+      await msalInstance.logoutPopup();
       setIsAuthenticated(false);
       setUserName('');
       setUserRole([]);
       setAccessToken('');
-      setGroupNames([]); // Clear group names on logout
-      console.log("App.js: Logout successful, state cleared.");
+      setGroupNames([]);
     } catch (error) {
-      console.error('App.js: Logout error:', error);
+      console.error('Logout error:', error);
     }
   };
 
   if (isLoading) {
-    console.log("App.js: Loading state is active.");
     return <div>Loading...</div>;
   }
 
