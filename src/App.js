@@ -45,6 +45,7 @@ const App = ({ msalInstance }) => {
 
           if (!account) {
             setIsLoading(false);
+            console.warn("App.js: No account:", account);
             return;
           }
           
@@ -56,11 +57,15 @@ const App = ({ msalInstance }) => {
             scopes: ["User.Read"],
           })).accessToken;
 
-          console.log("App.js: token:", token);
-
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
           const groups = await fetchGroupNames(apiUrl, token, email);
+
           console.log("App.js: groups:", groups);
+          console.log("App.js: email:", email);
+          console.log("App.js: token:", token);
+          console.log("App.js: apiUrl:", apiUrl);
+
+
           setGroupNames(groups);
           setUserRole(groups);
         

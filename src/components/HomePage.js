@@ -42,11 +42,15 @@ const HomePage = ({ userRole, userCustomId }) => {
         })
       ).accessToken;
 
+      console.log("Homepage.js: token:", token);
       console.log("Homepage.js: userRole:", userRole);
 
       const groupIds = userRole
         .filter((role) => role.includes("Group"))
         .map((role) => role.split("-")[1]);
+
+
+        console.log("Homepage.js: groupIds:", groupIds);
 
       const groupNamesFetched = await fetchGroupNames(groupIds, token);
 
