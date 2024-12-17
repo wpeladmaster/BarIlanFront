@@ -9,7 +9,7 @@ import HomePage from './components/HomePage';
 import AdminSearch from './components/AdminSearch';
 import fetchGroupNames from './utils/fetchGroupNames';
 
-const App = ({ msalInstance }) => {
+const App = () => {
   const { instance } = useMsal();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,58 +21,54 @@ const App = ({ msalInstance }) => {
 
   useEffect(() => {
     const checkSession = async () => {
-
-      console.log("App.js: instance:", instance);
-
+      console.log("App.js: Starting session check...");
       try {
         if (!instance) {
+          console.warn("App.js: MSAL instance not initialized.");
           setIsLoading(false);
           return;
         }
 
         const allAccounts = instance.getAllAccounts();
+        console.log("App.js: All accounts fetched:", allAccounts);
+
         if (!allAccounts.length) {
+          console.warn("App.js: No active accounts found.");
           setIsLoading(false);
           return;
         }
 
-        console.log("App.js: allAccounts:", allAccounts);
-
         const account = instance.getActiveAccount() || allAccounts[0];
         instance.setActiveAccount(account);
+        console.log("App.js: Active account set:", account);
 
-        console.log("App.js: account:", account);
+        if (!account) {
+          console.warn("App.js: No valid account.");
+          setIsLoading(false);
+          return;
+        }
 
-          if (!account) {
-            setIsLoading(false);
-            console.warn("App.js: No account:", account);
-            return;
-          }
-          
-          setIsAuthenticated(true);
-          setUserName(account.name || account.username);
-          const email = account.username.split('@')[0];
+        setIsAuthenticated(true);
+        setUserName(account.name || account.username);
+        const email = account.username.split('@')[0];
+        console.log("App.js: User email extracted:", email);
 
-          const token = (await instance.acquireTokenSilent({
-            scopes: ["User.Read"],
-          })).accessToken;
+        const token = (await instance.acquireTokenSilent({ scopes: ["User.Read"] })).accessToken;
+        console.log("App.js: Token acquired successfully.");
 
-          const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-          const groups = await fetchGroupNames(apiUrl, token, email);
+        const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+        console.log("App.js: API URL:", apiUrl);
 
-          console.log("App.js: groups:", groups);
-          console.log("App.js: email:", email);
-          console.log("App.js: token:", token);
-          console.log("App.js: apiUrl:", apiUrl);
+        const groups = await fetchGroupNames(apiUrl, token, email);
+        console.log("App.js: Groups fetched:", groups);
 
-
-          setGroupNames(groups);
-          setUserRole(groups);
-        
+        setGroupNames(groups);
+        setUserRole(groups);
       } catch (error) {
-        console.error('Error during session check:', error);
+        console.error("App.js: Error during session check:", error);
       } finally {
         setIsLoading(false);
+        console.log("App.js: Session check complete.");
       }
     };
 
@@ -81,41 +77,46 @@ const App = ({ msalInstance }) => {
 
   const handleLogin = async () => {
     try {
+      console.log("App.js: Attempting login...");
       const loginResponse = await instance.loginPopup(loginRequest);
+      console.log("App.js: Login successful:", loginResponse);
+
       instance.setActiveAccount(loginResponse.account);
-
       setIsAuthenticated(true);
-      setUserName(loginResponse.account.name || loginResponse.account.username);
-      const email = loginResponse.account.username.split('@')[0];
 
-      const token = (await instance.acquireTokenSilent({
-        scopes: ["User.Read"],
-      })).accessToken;
+      const email = loginResponse.account.username.split('@')[0];
+      setUserName(loginResponse.account.name || loginResponse.account.username);
+
+      const token = (await instance.acquireTokenSilent({ scopes: ["User.Read"] })).accessToken;
+      console.log("App.js: Token acquired post-login.");
 
       const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
       const groups = await fetchGroupNames(apiUrl, token, email);
+
+      console.log("App.js: Groups fetched post-login:", groups);
       setGroupNames(groups);
       setUserRole(groups);
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("App.js: Login error:", error);
     }
   };
 
   const handleLogout = async () => {
     try {
-      await instance.logoutPopup({
-        postLogoutRedirectUri: window.location.origin,
-      });
+      console.log("App.js: Logging out...");
+      await instance.logoutPopup({ postLogoutRedirectUri: window.location.origin });
       setIsAuthenticated(false);
       setUserName('');
       setUserRole([]);
       setGroupNames([]);
+      console.log("App.js: Logout successful.");
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("App.js: Logout error:", error);
     }
   };
 
   if (isLoading) {
+    console.log("App.js: Loading...");
     return <div>Loading...</div>;
   }
 

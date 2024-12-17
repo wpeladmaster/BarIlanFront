@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useMsal } from "@azure/msal-react"; // MSAL hook
+import { useMsal } from "@azure/msal-react";
 import InstructorsList from "./lists/InstructorsList";
 import StudentsList from "./lists/StudentsList";
 import PatientsList from "./lists/PatientsList";
@@ -12,142 +12,58 @@ import Loader from "./Loader";
 import fetchGroupNames from "../utils/fetchGroupNames";
 import "../style/HomePage.scss";
 
-const HomePage = ({ userRole, userCustomId }) => {
-  const { instance, accounts } = useMsal();
+const HomePage = ({ userRole }) => {
+  const { instance } = useMsal();
   const [instructors, setInstructors] = useState([]);
-  const [selectedInstructor, setSelectedInstructor] = useState(null);
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const [selectedPatient, setSelectedPatient] = useState(null);
-  const [selectedVideo, setSelectedVideo] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [groupNames, setGroupNames] = useState([]);
-  const [userEmail, setUserEmail] = useState(null);
-
   const { students, fetchStudents } = useStudents();
   const { patients, fetchPatients } = usePatients();
   const { videoList, fetchVideos } = useVideos();
 
   const isAdmin = useMemo(() => userRole.includes("Admins"), [userRole]);
-  const isInstructor = useMemo(() => userRole.includes("Instructors"), [userRole]);
-  const isStudent = useMemo(() => userRole.includes("Students"), [userRole]);
 
-  const fetchGroups = async () => {
-    if (!instance) return;
+  useEffect(() => {
+    if (!isAdmin) return;
 
-    try {
+    const fetchInstructors = async () => {
+      console.log("HomePage.js: Fetching instructors...");
       setLoading(true);
-      const token = (
-        await instance.acquireTokenSilent({
-          scopes: ["User.Read"],
-        })
-      ).accessToken;
+      try {
+        const token = (await instance.acquireTokenSilent({ scopes: ["User.Read"] })).accessToken;
+        const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
 
-      console.log("Homepage.js: token:", token);
-      console.log("Homepage.js: userRole:", userRole);
+        const response = await fetch(`${apiUrl}/fetchinstructors`, {
+          headers: { Authorization: token, "Content-Type": "application/json" },
+        });
 
-      const groupIds = userRole
-        .filter((role) => role.includes("Group"))
-        .map((role) => role.split("-")[1]);
+        if (!response.ok) throw new Error("Failed to fetch instructors");
+        const data = await response.json();
+        console.log("HomePage.js: Instructors fetched:", data);
+        setInstructors(data.unique_instructors_codes || []);
+      } catch (error) {
+        console.error("HomePage.js: Error fetching instructors:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-
-        console.log("Homepage.js: groupIds:", groupIds);
-
-      const groupNamesFetched = await fetchGroupNames(groupIds, token);
-
-      console.log("Homepage.js: groupNamesFetched:", groupNamesFetched);
-
-      setGroupNames(groupNamesFetched);
-    } catch (error) {
-      console.error("Error fetching group names:", error);
-    } finally {
-      setLoading(false); // Stop loader
-    }
-  };
-
-  useEffect(() => {
-    fetchGroups();
-  }, [instance, userRole]);
-
-  // Fetch instructors for admins
-  useEffect(() => {
-    if (isAdmin) {
-      const fetchInstructors = async () => {
-        setLoading(true);
-        try {
-          const token = (
-            await instance.acquireTokenSilent({
-              scopes: ["User.Read"],
-            })
-          ).accessToken;
-
-          const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-          const response = await fetch(`${apiUrl}/fetchinstructors`, {
-            method: "GET",
-            headers: {
-              Authorization: token,
-              "Content-Type": "application/json",
-            },
-          });
-
-          if (!response.ok) throw new Error("Failed to fetch instructors");
-          const data = await response.json();
-          setInstructors(data.unique_instructors_codes || []);
-        } catch (error) {
-          console.error("Error fetching instructors:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchInstructors();
-    }
-  }, [isAdmin, instance]);
-
-  const handleLogout = async () => {
-    try {
-      await instance.logoutPopup({
-        postLogoutRedirectUri: "/", // After logout, redirect to homepage
-      });
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (accounts.length > 0) {
-      setUserEmail(accounts[0].username); // Set user email from MSAL account info
-    }
-  }, [accounts]);
+    fetchInstructors();
+  }, [instance, isAdmin]);
 
   return (
     <div className="main-container homepage">
-      <div>
-        <h2>User Email</h2>
-        <p>{userEmail || "Fetching email..."}</p>
-        <button onClick={handleLogout}>Logout</button>
-      </div>
+      <h2>Homepage</h2>
+      {loading && <Loader />}
 
-      <div>
-        <h2>Group Names</h2>
-        {groupNames.length > 0 ? (
-          <ul>
-            {groupNames.map((groupName, index) => (
-              <li key={index}>{groupName}</li>
-            ))}
-          </ul>
-        ) : loading ? (
-          <p>Loading group names...</p>
-        ) : (
-          <p>No groups available</p>
-        )}
-      </div>
-
-      <InstructorsList instructors={instructors} />
+      {isAdmin && (
+        <>
+          <h3>Instructors List</h3>
+          <InstructorsList instructors={instructors} />
+        </>
+      )}
       <StudentsList students={students} />
       <PatientsList patients={patients} />
       <VideosList videos={videoList} />
-      {loading && <Loader />}
-      {selectedVideo && <VideoModal video={selectedVideo} />}
     </div>
   );
 };
