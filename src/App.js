@@ -21,59 +21,69 @@ const App = () => {
 
   useEffect(() => {
     const checkSession = async () => {
-      console.log("App.js: Starting session check...");
+      console.log("App.js: Checking session...");
+  
+      if (!instance) {
+        console.warn("App.js: MSAL instance is not initialized.");
+        setIsLoading(false);
+        return;
+      }
+  
       try {
-        if (!instance) {
-          console.warn("App.js: MSAL instance not initialized.");
-          setIsLoading(false);
-          return;
-        }
-
         const allAccounts = instance.getAllAccounts();
-        console.log("App.js: All accounts fetched:", allAccounts);
-
+        console.log("App.js: All accounts:", allAccounts);
+  
         if (!allAccounts.length) {
-          console.warn("App.js: No active accounts found.");
+          console.warn("App.js: No accounts found.");
           setIsLoading(false);
           return;
         }
-
+  
         const account = instance.getActiveAccount() || allAccounts[0];
         instance.setActiveAccount(account);
-        console.log("App.js: Active account set:", account);
-
+        console.log("App.js: Active account:", account);
+  
         if (!account) {
-          console.warn("App.js: No valid account.");
+          console.warn("App.js: No active account set.");
           setIsLoading(false);
           return;
         }
-
+  
         setIsAuthenticated(true);
         setUserName(account.name || account.username);
         const email = account.username.split('@')[0];
-        console.log("App.js: User email extracted:", email);
-
-        const token = (await instance.acquireTokenSilent({ scopes: ["User.Read"] })).accessToken;
-        console.log("App.js: Token acquired successfully.");
-
-        const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-        console.log("App.js: API URL:", apiUrl);
-
-        const groups = await fetchGroupNames(apiUrl, token, email);
-        console.log("App.js: Groups fetched:", groups);
-
-        setGroupNames(groups);
-        setUserRole(groups);
-      } catch (error) {
-        console.error("App.js: Error during session check:", error);
+  
+        // Token acquisition
+        try {
+          const tokenResponse = await instance.acquireTokenSilent({
+            scopes: ["User.Read"],
+          });
+          const token = tokenResponse.accessToken;
+  
+          console.log("App.js: Token acquired successfully:", token);
+  
+          const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+          console.log("App.js: API URL:", apiUrl);
+  
+          const groups = await fetchGroupNames(apiUrl, token, email);
+          console.log("App.js: Groups fetched:", groups);
+  
+          setGroupNames(groups);
+          setUserRole(groups);
+        } catch (tokenError) {
+          console.error("App.js: Token acquisition error:", tokenError);
+        }
+  
+      } catch (sessionError) {
+        console.error("App.js: Error during session check:", sessionError);
       } finally {
         setIsLoading(false);
-        console.log("App.js: Session check complete.");
       }
     };
-
+  
     checkSession();
   }, [instance]);
+  
 
   const handleLogin = async () => {
     try {
@@ -91,6 +101,8 @@ const App = () => {
       console.log("App.js: Token acquired post-login.");
 
       const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+      console.log("App.js: API Gateway URL:", apiUrl);
+
       const groups = await fetchGroupNames(apiUrl, token, email);
 
       console.log("App.js: Groups fetched post-login:", groups);

@@ -19,11 +19,13 @@ const HomePage = ({ userRole }) => {
   const { students, fetchStudents } = useStudents();
   const { patients, fetchPatients } = usePatients();
   const { videoList, fetchVideos } = useVideos();
-
   const isAdmin = useMemo(() => userRole.includes("Admins"), [userRole]);
 
+  console.log("HomePage.js: userRole - ", userRole);
+  
+
   useEffect(() => {
-    if (!isAdmin) return;
+    //if (!isAdmin) return;
 
     const fetchInstructors = async () => {
       console.log("HomePage.js: Fetching instructors...");
