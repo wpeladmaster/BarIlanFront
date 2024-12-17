@@ -7,7 +7,7 @@ import Footer from './components/Footer';
 import Login from './components/Login';
 import HomePage from './components/HomePage';
 import AdminSearch from './components/AdminSearch';
-import fetchGroupNames from './utils/fetchGroupNames'; // Import the utility function
+import fetchGroupNames from './utils/fetchGroupNames';
 
 const App = ({ msalInstance }) => {
   const { instance } = useMsal();
@@ -47,10 +47,11 @@ const App = ({ msalInstance }) => {
             scopes: ["User.Read"],
           })).accessToken;
 
-          console.log("token:", token);
+          console.log("App.js: token:", token);
 
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
           const groups = await fetchGroupNames(apiUrl, token, email);
+          console.log("App.js: groups:", groups);
           setGroupNames(groups);
           setUserRole(groups);
         }

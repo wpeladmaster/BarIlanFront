@@ -1,4 +1,9 @@
 const fetchGroupNames = async (apiUrl, token, email) => {
+
+  console.log("fetchGroupNames.js: apiUrl:", apiUrl);
+  console.log("fetchGroupNames.js: token:", token);
+  console.log("fetchGroupNames.js: email:", email);
+  
   try {
     const response = await fetch(`${apiUrl}/fetchgroups`, {
       method: 'POST',

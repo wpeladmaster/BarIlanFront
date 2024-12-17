@@ -13,13 +13,13 @@ import fetchGroupNames from "../utils/fetchGroupNames";
 import "../style/HomePage.scss";
 
 const HomePage = ({ userRole, userCustomId }) => {
-  const { instance, accounts } = useMsal(); // MSAL instance and account from context
+  const { instance, accounts } = useMsal();
   const [instructors, setInstructors] = useState([]);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const [loading, setLoading] = useState(false); // Unified loader state
+  const [loading, setLoading] = useState(false);
   const [groupNames, setGroupNames] = useState([]);
   const [userEmail, setUserEmail] = useState(null);
 
@@ -35,18 +35,23 @@ const HomePage = ({ userRole, userCustomId }) => {
     if (!instance) return;
 
     try {
-      setLoading(true); // Start loader
+      setLoading(true);
       const token = (
         await instance.acquireTokenSilent({
           scopes: ["User.Read"],
         })
       ).accessToken;
 
+      console.log("Homepage.js: userRole:", userRole);
+
       const groupIds = userRole
         .filter((role) => role.includes("Group"))
         .map((role) => role.split("-")[1]);
 
       const groupNamesFetched = await fetchGroupNames(groupIds, token);
+
+      console.log("Homepage.js: groupNamesFetched:", groupNamesFetched);
+
       setGroupNames(groupNamesFetched);
     } catch (error) {
       console.error("Error fetching group names:", error);
