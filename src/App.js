@@ -21,6 +21,9 @@ const App = ({ msalInstance }) => {
 
   useEffect(() => {
     const checkSession = async () => {
+
+      console.log("App.js: instance:", instance);
+
       try {
         if (!instance) {
           setIsLoading(false);
@@ -33,11 +36,14 @@ const App = ({ msalInstance }) => {
           return;
         }
 
+        console.log("App.js: allAccounts:", allAccounts);
+
         const account = instance.getActiveAccount() || allAccounts[0];
         instance.setActiveAccount(account);
 
+        console.log("App.js: account:", account);
+
         if (account) {
-          console.log("account:", account);
           
           setIsAuthenticated(true);
           setUserName(account.name || account.username);
