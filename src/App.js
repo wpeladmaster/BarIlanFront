@@ -43,7 +43,10 @@ const App = ({ msalInstance }) => {
 
         console.log("App.js: account:", account);
 
-        if (account) {
+          if (!account) {
+            setIsLoading(false);
+            return;
+          }
           
           setIsAuthenticated(true);
           setUserName(account.name || account.username);
@@ -60,7 +63,7 @@ const App = ({ msalInstance }) => {
           console.log("App.js: groups:", groups);
           setGroupNames(groups);
           setUserRole(groups);
-        }
+        
       } catch (error) {
         console.error('Error during session check:', error);
       } finally {
