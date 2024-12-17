@@ -35,7 +35,11 @@ const HomePage = ({ userRole }) => {
         const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
 
         const response = await fetch(`${apiUrl}/fetchinstructors`, {
-          headers: { Authorization: token, "Content-Type": "application/json" },
+          method: 'GET',
+          headers: {
+            Authorization: token,
+            'Content-Type': 'application/json',
+          },
         });
 
         if (!response.ok) throw new Error("Failed to fetch instructors");
