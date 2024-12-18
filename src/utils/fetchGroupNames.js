@@ -30,7 +30,7 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
 
     // Log the parsed data
     console.log("fetchGroupNames.js: Fetched groups data:", data);
-    return data.groups || [];
+    return data.groups_names || [];
   } catch (error) {
     // Log detailed error information
     console.error("fetchGroupNames.js: Error fetching user groups:", error);
