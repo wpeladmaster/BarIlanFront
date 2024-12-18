@@ -1,10 +1,11 @@
-const fetchGroupNames = async (apiUrl, token, email) => {
+const fetchGroupNames = async (apiUrl, token, therapist_code) => {
   console.log("fetchGroupNames.js: apiUrl:", apiUrl);
   console.log("fetchGroupNames.js: token:", token);
-  console.log("fetchGroupNames.js: email:", email);
+  console.log("fetchGroupNames.js: therapist_code:", therapist_code);
 
   try {
-    const response = await fetch(`${apiUrl}/fetchgroups`, {
+    const fullUrl = `${apiUrl}/fetchgroups?therapist_code=${therapist_code}`;
+    const response = await fetch(fullUrl, {
       method: 'GET',
       headers: {
         Authorization: token,
