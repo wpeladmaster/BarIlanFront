@@ -21,114 +21,75 @@ const App = () => {
 
   useEffect(() => {
     const checkSession = async () => {
-      console.log("App.js: Checking session...");
-  
-      if (!instance) {
-        console.warn("App.js: MSAL instance is not initialized.");
-        setIsLoading(false);
-        return;
-      }
-  
       try {
         const allAccounts = instance.getAllAccounts();
-        console.log("App.js: All accounts:", allAccounts);
-  
-        if (!allAccounts.length) {
-          console.warn("App.js: No accounts found.");
+        if (allAccounts.length === 0) {
           setIsLoading(false);
           return;
         }
-  
+
         const account = instance.getActiveAccount() || allAccounts[0];
         instance.setActiveAccount(account);
-        console.log("App.js: Active account:", account);
-  
+
         if (!account) {
-          console.warn("App.js: No active account set.");
           setIsLoading(false);
           return;
         }
-  
+
+        const tokenResponse = await instance.acquireTokenSilent({ scopes: ["User.Read"] });
+        const token = tokenResponse.accessToken;
+
+        const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+        const email = account.username.split('@')[0];
+        const groups = await fetchGroupNames(apiUrl, token, email);
+
         setIsAuthenticated(true);
         setUserName(account.name || account.username);
-        const email = account.username.split('@')[0];
-  
-        // Token acquisition
-        try {
-          const tokenResponse = await instance.acquireTokenSilent({
-            scopes: ["User.Read"],
-          });
-          const token = tokenResponse.accessToken;
-  
-          console.log("App.js: Token acquired successfully:", token);
-  
-          const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-          console.log("App.js: API URL:", apiUrl);
-  
-          const groups = await fetchGroupNames(apiUrl, token, email);
-          console.log("App.js: Groups fetched:", groups);
-  
-          setGroupNames(groups);
-          setUserRole(groups);
-        } catch (tokenError) {
-          console.error("App.js: Token acquisition error:", tokenError);
-        }
-  
-      } catch (sessionError) {
-        console.error("App.js: Error during session check:", sessionError);
+        setGroupNames(groups);
+        setUserRole(groups);
+      } catch (error) {
+        console.error('Error during session check:', error);
       } finally {
         setIsLoading(false);
       }
     };
-  
+
     checkSession();
   }, [instance]);
-  
 
   const handleLogin = async () => {
     try {
-      console.log("App.js: Attempting login...");
       const loginResponse = await instance.loginPopup(loginRequest);
-      console.log("App.js: Login successful:", loginResponse);
-
       instance.setActiveAccount(loginResponse.account);
-      setIsAuthenticated(true);
 
       const email = loginResponse.account.username.split('@')[0];
-      setUserName(loginResponse.account.name || loginResponse.account.username);
-
       const token = (await instance.acquireTokenSilent({ scopes: ["User.Read"] })).accessToken;
-      console.log("App.js: Token acquired post-login.");
 
       const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-      console.log("App.js: API Gateway URL:", apiUrl);
-
       const groups = await fetchGroupNames(apiUrl, token, email);
 
-      console.log("App.js: Groups fetched post-login:", groups);
+      setIsAuthenticated(true);
+      setUserName(loginResponse.account.name || loginResponse.account.username);
       setGroupNames(groups);
       setUserRole(groups);
     } catch (error) {
-      console.error("App.js: Login error:", error);
+      console.error('Login error:', error);
     }
   };
 
   const handleLogout = async () => {
     try {
-      console.log("App.js: Logging out...");
       await instance.logoutPopup({ postLogoutRedirectUri: window.location.origin });
       setIsAuthenticated(false);
       setUserName('');
       setUserRole([]);
       setGroupNames([]);
-      console.log("App.js: Logout successful.");
     } catch (error) {
-      console.error("App.js: Logout error:", error);
+      console.error('Logout error:', error);
     }
   };
 
   if (isLoading) {
-    console.log("App.js: Loading...");
     return <div>Loading...</div>;
   }
 

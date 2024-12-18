@@ -32,44 +32,38 @@ const HomePage = ({ userRole, userCustomId }) => {
   const { patients, fetchPatients } = usePatients();
   const { videoList, fetchVideos, groupedVideos } = useVideos();
 
-    useEffect(() => {
-    console.log('userRole:', userRole);
-    console.log('userCustomId:', userCustomId);
-  }, [userRole, userCustomId]);
+  //   useEffect(() => {
+  //   console.log('userRole:', userRole);
+  //   console.log('userCustomId:', userCustomId);
+  // }, [userRole, userCustomId]);
 
   // Memoize user roles to avoid recalculating on every render
   const isAdmin = useMemo(() => userRole.includes('Admins'), [userRole]);
-  const isInstructor = useMemo(() => userRole.includes('Instructors'), [userRole]);
-  const isStudent = useMemo(() => userRole.includes('Students'), [userRole]);
+  const isInstructor = useMemo(() => userRole.includes('Supervisers'), [userRole]);
+  const isStudent = useMemo(() => userRole.includes('Therapists'), [userRole]);
 
-
-  console.log("HomePage.js: userRole - ", userRole);
-  
 
   useEffect(() => {
-    //if (!isAdmin) return;
+    if (!isAdmin) return;
 
     const fetchInstructors = async () => {
-      console.log("HomePage.js: Fetching instructors...");
       setLoadingInstructors(true);
       try {
         const token = (await instance.acquireTokenSilent({ scopes: ["User.Read"] })).accessToken;
         const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-
         const response = await fetch(`${apiUrl}/fetchinstructors`, {
           method: 'GET',
           headers: {
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
 
-        if (!response.ok) throw new Error("Failed to fetch instructors");
+        if (!response.ok) throw new Error('Failed to fetch instructors');
         const data = await response.json();
-        console.log("HomePage.js: Instructors fetched:", data);
         setInstructors(data.unique_instructors_codes || []);
       } catch (error) {
-        console.error("HomePage.js: Error fetching instructors:", error);
+        console.error('Error fetching instructors:', error);
       } finally {
         setLoadingInstructors(false);
       }
