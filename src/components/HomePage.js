@@ -47,14 +47,19 @@ const HomePage = ({ userRole, userCustomId }) => {
   
 
   useEffect(() => {
-    //if (!isAdmin) return;
+    if (!isAdmin) return;
 
     const fetchInstructors = async () => {
       console.log("HomePage.js: Fetching instructors...");
       setLoadingInstructors(true);
       try {
         const token = (await instance.acquireTokenSilent({ scopes: ["User.Read"] })).accessToken;
+
+        console.log("fetchinstructors:token: ", token);
+
         const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+
+        console.log("fetchinstructors:apiUrl: ", apiUrl);
 
         const response = await fetch(`${apiUrl}/fetchinstructors`, {
           method: 'GET',
@@ -64,9 +69,23 @@ const HomePage = ({ userRole, userCustomId }) => {
           },
         });
 
-        if (!response.ok) throw new Error("Failed to fetch instructors");
+            // Log the response status and headers for debugging
+        console.log("fetchinstructors: Response status:", response.status);
+        console.log("fetchinstructors: Response headers:", JSON.stringify([...response.headers]));
+
+
+        if (!response.ok) {
+          // Log the entire response text for detailed failure information
+          const errorText = await response.text();
+          console.error("instructors: Response error text:", errorText);
+          throw new Error(`Failed to fetch instructors: ${response.statusText} (${response.status})`);
+        }
+
+        console.log("fetchGroupNames.js: Parsing response JSON...");
         const data = await response.json();
+
         console.log("HomePage.js: Instructors fetched:", data);
+
         setInstructors(data.unique_instructors_codes || []);
       } catch (error) {
         console.error("HomePage.js: Error fetching instructors:", error);
