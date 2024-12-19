@@ -68,7 +68,7 @@ const HomePage = ({ userRole, userCustomId }) => {
         const response = await fetch(fullUrl, {
           method: "GET",
           headers: {
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
