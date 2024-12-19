@@ -56,7 +56,8 @@ const HomePage = ({ userToken, userRole, userCustomId }) => {
       try {
         const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
         const fullUrl = `${apiUrl}/fetchinstructors`;
-    
+        console.log("Homepage instructors fullUrl: ", fullUrl);
+        console.log("Homepage instructors userToken: ", userToken);
         const response = await fetch(fullUrl, {
           method: "GET",
           headers: {
@@ -65,7 +66,7 @@ const HomePage = ({ userToken, userRole, userCustomId }) => {
           },
         });
     
-        console.log("fetchinstructors: Response status:", response.status);
+        console.log("Homepage instructors: Response status:", response.status);
     
         if (!response.ok) {
           const errorText = await response.text();
