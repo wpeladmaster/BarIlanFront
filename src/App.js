@@ -15,9 +15,10 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState([]);
+  const [userToken, setUserToken] = useState([]);
   const [groupNames, setGroupNames] = useState([]);
 
-  const loginRequest = { scopes: ["User.Read"] };
+  const loginRequest = { scopes: ["User.Read.All"] };
 
   useEffect(() => {
     const checkSession = async () => {
@@ -70,6 +71,7 @@ const App = () => {
   
           setGroupNames(groups);
           setUserRole(groups);
+          setUserToken(token);
         } catch (tokenError) {
           console.error("App.js: Token acquisition error:", tokenError);
         }
@@ -143,7 +145,7 @@ const App = () => {
         />
         <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
-          <Route path="/homepage" element={isAuthenticated ? <HomePage userRole={userRole} groupNames={groupNames} /> : <Navigate to="/" />} />
+          <Route path="/homepage" element={isAuthenticated ? <HomePage userToken={userToken} userRole={userRole} groupNames={groupNames} /> : <Navigate to="/" />} />
           <Route path="/admin-search" element={isAuthenticated && userRole.includes('Admins') ? <AdminSearch groupNames={groupNames} /> : <Navigate to="/" />} />
         </Routes>
         <Footer />

@@ -12,7 +12,7 @@ import Loader from "./Loader";
 //import fetchGroupNames from "../utils/fetchGroupNames";
 import "../style/HomePage.scss";
 
-const HomePage = ({ userRole, userCustomId }) => {
+const HomePage = ({ userToken, userRole, userCustomId }) => {
   const { instance } = useMsal();
   const [instructors, setInstructors] = useState([]);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
@@ -54,7 +54,7 @@ const HomePage = ({ userRole, userCustomId }) => {
       console.log("HomePage.js: Fetching instructors...");
       setLoadingInstructors(true);
       try {
-        const token = (await instance.acquireTokenSilent({ scopes: ["User.Read"] })).accessToken;
+        const token = userToken;
 
         console.log("fetchinstructors:token: ", token);
 
