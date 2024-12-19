@@ -57,7 +57,7 @@ const HomePage = ({ userRole, userCustomId }) => {
       try {
 
         const tokenResponse = await instance.acquireTokenSilent({
-          scopes: ["User.Read.All", "openid","APIConnectors.Read.All"],
+          scopes: ["User.Read.All", "openid"],
         });
         const token = tokenResponse.accessToken;
 
