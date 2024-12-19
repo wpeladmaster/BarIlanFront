@@ -8,7 +8,7 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
     const response = await fetch(fullUrl, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
         'Content-Type': 'application/json',
       },
     });
