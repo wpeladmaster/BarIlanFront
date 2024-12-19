@@ -10,6 +10,6 @@ export const msalConfig = {
     },
   };
   export const loginRequest = {
-    scopes: ["email","openid","profile", "User.Read", "User.ReadBasic.All", "GroupMember.Read.All"],
+    scopes: ["email","openid","profile", "User.Read", "User.Read.All", "User.ReadBasic.All", "GroupMember.Read.All"],
   };
   
