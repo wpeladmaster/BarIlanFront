@@ -44,6 +44,7 @@ const HomePage = ({ userRole, userCustomId }) => {
 
 
   console.log("HomePage.js: userRole - ", userRole);
+  console.log("HomePage.js: isAdmin - ", isAdmin);
   
 
   useEffect(() => {

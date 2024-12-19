@@ -30,7 +30,12 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
 
     // Log the parsed data
     console.log("fetchGroupNames.js: Fetched groups data:", data);
-    return data.groups_names || [];
+
+    // Transform the groups to ensure they're returned as a valid array of strings
+    const groups = data.groups_names || [];
+    const normalizedGroups = groups.map(group => group.replace(/[{}"]/g, '')); // Remove unnecessary braces or quotes
+    console.log("fetchGroupNames.js: Normalized groups:", normalizedGroups);
+    return normalizedGroups;
   } catch (error) {
     // Log detailed error information
     console.error("fetchGroupNames.js: Error fetching user groups:", error);
