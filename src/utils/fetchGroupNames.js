@@ -18,26 +18,25 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
     console.log("fetchGroupNames.js: Response headers:", JSON.stringify([...response.headers]));
 
     if (!response.ok) {
-      // Log the entire response text for detailed failure information
       const errorText = await response.text();
       console.error("fetchGroupNames.js: Response error text:", errorText);
       throw new Error(`Failed to fetch groups: ${response.statusText} (${response.status})`);
     }
 
-    // Log if the JSON parsing starts
     console.log("fetchGroupNames.js: Parsing response JSON...");
     const data = await response.json();
 
-    // Log the parsed data
     console.log("fetchGroupNames.js: Fetched groups data:", data);
 
-    // Transform the groups to ensure they're returned as a valid array of strings
+    // Safely transform the groups to strings and normalize them
     const groups = data.groups_names || [];
-    const normalizedGroups = groups.map(group => group.replace(/[{}"]/g, '')); // Remove unnecessary braces or quotes
+    const normalizedGroups = groups
+      .map(group => (typeof group === 'string' ? group.replace(/[{}"]/g, '') : group))
+      .flatMap(group => (typeof group === 'string' ? group.split(',') : []));
+
     console.log("fetchGroupNames.js: Normalized groups:", normalizedGroups);
     return normalizedGroups;
   } catch (error) {
-    // Log detailed error information
     console.error("fetchGroupNames.js: Error fetching user groups:", error);
     return [];
   }
