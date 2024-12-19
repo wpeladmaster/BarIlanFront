@@ -54,46 +54,44 @@ const HomePage = ({ userToken, userRole, userCustomId }) => {
       console.log("HomePage.js: Fetching instructors...");
       setLoadingInstructors(true);
       try {
-
-        console.log("fetchinstructors:token: ", userToken);
-
         const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-
-        console.log("fetchinstructors:apiUrl: ", apiUrl);
-
         const fullUrl = `${apiUrl}/fetchinstructors`;
+    
         const response = await fetch(fullUrl, {
-          method: 'GET',
+          method: "GET",
           headers: {
             Authorization: userToken,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         });
-
-            // Log the response status and headers for debugging
+    
         console.log("fetchinstructors: Response status:", response.status);
-        console.log("fetchinstructors: Response headers:", JSON.stringify([...response.headers]));
-
-
+    
         if (!response.ok) {
-          // Log the entire response text for detailed failure information
           const errorText = await response.text();
           console.error("instructors: Response error text:", errorText);
-          throw new Error(`Failed to fetch instructors: ${response.statusText} (${response.status})`);
+          if (response.status === 403) {
+            throw new Error(
+              "Authorization error: Ensure your token has correct permissions"
+            );
+          }
+          throw new Error(
+            `Failed to fetch instructors: ${response.statusText} (${response.status})`
+          );
         }
-
-        console.log("fetchGroupNames.js: Parsing response JSON...");
+    
         const data = await response.json();
-
         console.log("HomePage.js: Instructors fetched:", data);
-
+    
         setInstructors(data.unique_instructors_codes || []);
       } catch (error) {
-        console.error("HomePage.js: Error fetching instructors:", error);
+        console.error("HomePage.js: Error fetching instructors:", error.message);
+        alert(`Error: ${error.message}`);
       } finally {
         setLoadingInstructors(false);
       }
     };
+    
 
     fetchInstructors();
   }, [instance, isAdmin]);
