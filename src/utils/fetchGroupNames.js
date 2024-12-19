@@ -13,7 +13,6 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
       },
     });
 
-    // Log the response status and headers for debugging
     console.log("fetchGroupNames.js: Response status:", response.status);
     console.log("fetchGroupNames.js: Response headers:", JSON.stringify([...response.headers]));
 
@@ -28,11 +27,18 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
 
     console.log("fetchGroupNames.js: Fetched groups data:", data);
 
-    // Safely transform the groups to strings and normalize them
+    // Extract and normalize the groups
     const groups = data.groups_names || [];
     const normalizedGroups = groups
-      .map(group => (typeof group === 'string' ? group.replace(/[{}"]/g, '') : group))
-      .flatMap(group => (typeof group === 'string' ? group.split(',') : []));
+      .flatMap(innerArray =>
+        Array.isArray(innerArray)
+          ? innerArray.flatMap(groupString =>
+              typeof groupString === 'string'
+                ? groupString.replace(/[{}"]/g, '').split(',')
+                : []
+            )
+          : []
+      );
 
     console.log("fetchGroupNames.js: Normalized groups:", normalizedGroups);
     return normalizedGroups;
