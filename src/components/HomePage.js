@@ -12,7 +12,7 @@ import Loader from "./Loader";
 //import fetchGroupNames from "../utils/fetchGroupNames";
 import "../style/HomePage.scss";
 
-const HomePage = ({ userToken, userRole, userCustomId }) => {
+const HomePage = ({ userRole, userCustomId }) => {
   const { instance } = useMsal();
   const [instructors, setInstructors] = useState([]);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
@@ -50,18 +50,25 @@ const HomePage = ({ userToken, userRole, userCustomId }) => {
   useEffect(() => {
     if (!isAdmin) return;
 
+    
     const fetchInstructors = async () => {
       console.log("HomePage.js: Fetching instructors...");
       setLoadingInstructors(true);
       try {
+
+        const tokenResponse = await instance.acquireTokenSilent({
+          scopes: ["email","openid","profile", "User.Read", "User.Read.All", "User.ReadBasic.All", "GroupMember.Read.All"],
+        });
+        const token = tokenResponse.accessToken;
+
         const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
         const fullUrl = `${apiUrl}/fetchinstructors`;
         console.log("Homepage instructors fullUrl: ", fullUrl);
-        console.log("Homepage instructors userToken: ", userToken);
+        console.log("Homepage instructors token: ", token);
         const response = await fetch(fullUrl, {
           method: "GET",
           headers: {
-            Authorization: userToken,
+            Authorization: token,
             "Content-Type": "application/json",
           },
         });
