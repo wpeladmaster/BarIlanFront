@@ -54,18 +54,18 @@ const HomePage = ({ userToken, userRole, userCustomId }) => {
       console.log("HomePage.js: Fetching instructors...");
       setLoadingInstructors(true);
       try {
-        const token = userToken;
 
-        console.log("fetchinstructors:token: ", token);
+        console.log("fetchinstructors:token: ", userToken);
 
         const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
 
         console.log("fetchinstructors:apiUrl: ", apiUrl);
 
-        const response = await fetch(`${apiUrl}/fetchinstructors`, {
+        const fullUrl = `${apiUrl}/fetchinstructors`;
+        const response = await fetch(fullUrl, {
           method: 'GET',
           headers: {
-            Authorization: token,
+            Authorization: userToken,
             'Content-Type': 'application/json',
           },
         });
