@@ -48,10 +48,8 @@ const HomePage = ({ userRole, isAuthenticated }) => {
 
   useEffect(() => {
     if (!isAdmin) return;
-
+    setLoadingInstructors(true);
     const fetchInstructors = async () => {
-      console.log("HomePage.js: Fetching instructors...");
-      setLoadingInstructors(true);
       try {
 
         const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
@@ -64,7 +62,7 @@ const HomePage = ({ userRole, isAuthenticated }) => {
             "Content-Type": "application/json",
           },
         });
-    
+        setLoadingInstructors(false);
         if (!response.ok) {
           const errorText = await response.text();
           console.error("instructors: Response error text:", errorText);
@@ -76,16 +74,15 @@ const HomePage = ({ userRole, isAuthenticated }) => {
           throw new Error(
             `Failed to fetch instructors: ${response.statusText} (${response.status})`
           );
-          setLoadingInstructors(false);
+
         }
     
         const data = await response.json();
         setInstructors(data.unique_instructors_codes || []);
         setLoadingInstructors(false);
-
       } catch (error) {
         console.error("HomePage.js: Error fetching instructors:", error.message);
-        alert(`Error: ${error.message}`);
+        setLoadingInstructors(false);
       } finally {
         setLoadingInstructors(false);
       }

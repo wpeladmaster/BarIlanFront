@@ -1,25 +1,15 @@
 import { useState } from 'react';
-import { PublicClientApplication } from '@azure/msal-browser';
+import { useMsal } from "@azure/msal-react";
 
 const useStudents = () => {
+  const { instance } = useMsal();
   const [students, setStudents] = useState([]);
 
   const fetchStudents = async (therapistCodeLeader = '') => {
     try {
-      const msalConfig = {
-        auth: {
-          clientId: "aadb3f2f-d35f-4080-bc72-2ee32b741120",
-          authority: "https://login.microsoftonline.com/352ed1fa-2f18-487f-a4cf-4804faa235c7/saml2",
-          redirectUri: "http://localhost:3000"
-        }
-      };
-      
-      const msalInstance = new PublicClientApplication(msalConfig);
-      const token = (await msalInstance.acquireTokenSilent({
-        scopes: ["api://your_api_app_id/access_as_user"] // Replace with your API's app ID URI
-      })).accessToken;
-      const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
 
+      const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
+      const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
       const fullUrl = `${apiUrl}/fetchstudents?therapistCodeLeader=${therapistCodeLeader}`;
 
       const response = await fetch(fullUrl, {
