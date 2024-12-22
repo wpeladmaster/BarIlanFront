@@ -57,7 +57,7 @@ const HomePage = ({ userRole, isAuthenticated }) => {
             "Content-Type": "application/json",
           },
         });
-        setLoadingInstructors(true);
+
         if (!response.ok) {
           const errorText = await response.text();
           console.error("instructors: Response error text:", errorText);
@@ -92,14 +92,16 @@ const HomePage = ({ userRole, isAuthenticated }) => {
     if (isInstructor && isAuthenticated) {
       setLoadingStudents(true);
       fetchStudents(isAuthenticated);
+      setLoadingStudents(false);
     }
-  }, [isInstructor, isAuthenticated]);
+  }, [isInstructor, isAuthenticated, fetchStudents]);
 
   // Effect for fetching patients (only for Student users)
   useEffect(() => {
     if (isStudent && isAuthenticated) {
       setLoadingPatients(true);
       fetchPatients(isAuthenticated);
+      setLoadingPatients(false);
     }
   }, [isStudent, isAuthenticated]);
 
