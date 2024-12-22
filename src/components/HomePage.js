@@ -138,13 +138,21 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
     fetchPatients(studentCode).finally(() => setLoadingPatients(false));
   };
 
-  const handlePatientClick = (patientCode) => {
+  const handlePatientClick = async (patientCode) => {
     console.log('Fetching videos for patient:', patientCode);
     setSelectedPatient(patientCode);
     setSelectedVideo(null);
     setLoadingVideos(true);
-    fetchVideos(patientCode).finally(() => setLoadingVideos(false));
+  
+    try {
+      await fetchVideos(patientCode); // Call fetchVideos and wait for it to finish
+    } catch (error) {
+      console.error('Error fetching videos:', error); // Handle errors if any
+    } finally {
+      setLoadingVideos(false); // Ensure loading state is reset
+    }
   };
+  
   
 
   const handleVideoClick = (video) => {
