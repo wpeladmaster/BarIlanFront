@@ -1,32 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSession, activeTab, setActiveTab, handleTimeUpdate }) => {
-  // Always call hooks at the top level
-  const sessionVideos = groupedVideos[selectedSession] || [];
   
-  // Initialize active tab only if there is no active tab yet (only the first time)
+
   useEffect(() => {
-    if (selectedVideo && groupedVideos[selectedVideo.uniqueSessionName]) {
-      const videoSession = groupedVideos[selectedVideo.uniqueSessionName];
-      if (videoSession && videoSession.length > 0) {
-        setActiveTab(videoSession[0].fullVideoName); // Set initial active tab
-      }
+    if (groupedVideos[selectedSession] && groupedVideos[selectedSession].length > 0) {
+      setActiveTab(groupedVideos[selectedSession][0].fullVideoName);
     }
-  }, [selectedVideo, groupedVideos]);
-  
-  
+  }, [selectedVideo, groupedVideos, selectedSession, setActiveTab]);
+
+
+    if (!selectedVideo) return null;
+
   const handleTabChange = (tab) => {
-    console.log('Active tab changed:', tab);
-    setActiveTab(tab); // Change the active tab based on user click
+    setActiveTab(tab);
   };
 
   return (
     <div className="modal">
       <div className="modal-content">
         <span className="close" onClick={() => setSelectedVideo(null)}>&times;</span>
-        
         <div className="tabs">
-          {sessionVideos.map((video) => (
+          {groupedVideos[selectedSession]?.map((video) => (
             <button
               key={video.fileKey}
               className={video.fullVideoName === activeTab ? 'active' : ''}
@@ -36,20 +31,14 @@ const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSe
             </button>
           ))}
         </div>
-
         <div className="tab-content">
-          {sessionVideos.map((video) => (
+          {groupedVideos[selectedSession]?.map((video) => (
             video.fullVideoName === activeTab && (
               <div key={video.fileKey}>
                 {video.s3Url ? (
                   <>
-                    <video
-                      width="560"
-                      height="315"
-                      src={video.s3Url}
-                      controls
-                      onTimeUpdate={(e) => handleTimeUpdate(video.fileKey, e.target.currentTime)}
-                    ></video>
+                    {console.log('video:', video)}
+                    <video width="560" height="315" src={video.s3Url} controls onTimeUpdate={(e) => handleTimeUpdate(video.fileKey, e.target.currentTime)}></video>
                     <div className="video-details">
                       <h4>Session Details:</h4>
                       <div className='lists-wrapper'>
@@ -72,17 +61,11 @@ const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSe
                           </div>
                         </dl>
                         <dl>
-                          {video.date && video.date !== 'unknown' && (
-                            <div className='detail'>
+                        {video.date && video.date !== 'unknown' && (
+                          <div className='detail'>
                               <dt>Date:</dt>
                               <dd>{new Date(video.date).toLocaleDateString('he-IL')}</dd>
-                            </div>
-                          )}
-                          {video.time && video.time !== 'unknown' && (
-                            <div className='detail'>
-                              <dt>Time:</dt>
-                              <dd>{video.time}</dd>
-                            </div>
+                          </div>
                           )}
                           <div className='detail'>
                             <dt>Patient Code:</dt>
@@ -94,6 +77,7 @@ const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSe
                           </div>
                         </dl>
                       </div>
+
                     </div>
                   </>
                 ) : (
