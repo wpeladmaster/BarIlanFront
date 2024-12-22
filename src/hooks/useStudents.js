@@ -1,50 +1,70 @@
-import { useState } from 'react';
+import { useState, useCallback } from "react";
 import { useMsal } from "@azure/msal-react";
 
 const useStudents = () => {
   const { instance } = useMsal();
   const [students, setStudents] = useState([]);
 
-  const fetchStudents = async (userRole = '') => {
-
-    if (!userRole) {
-      console.warn("fetchStudents: userRole is undefined");
-      return;
-    }
-
-    try {
-
-      const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
-      const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-      const fullUrl = `${apiUrl}/fetchstudents?therapistCodeLeader=${userRole}`;
-
-      const response = await fetch(fullUrl, {
-        method: 'GET',
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch students');
+  const fetchStudents = useCallback(
+    async (userRole = "") => {
+      if (!userRole) {
+        console.warn("fetchStudents: userRole is undefined");
+        return;
       }
 
-      console.log("usesSudents.js: response - ", response);
-      const data = await response.json();
-      console.log('Fetched students data:', data);
+      try {
+        console.log("Fetching students for role:", userRole);
 
-      const studentCodes = data.unique_student_codes || [];
-      setStudents(studentCodes);
+        // Acquire token silently
+        const tokenResponse = await instance.acquireTokenSilent({
+          scopes: [
+            "openid",
+            "profile",
+            "email",
+            "User.Read",
+            "api://saml_barilan/user_impersonation/user_impersonation",
+          ],
+        });
+        const token = tokenResponse.accessToken;
 
-      if (studentCodes.length === 0) {
-        console.warn(`No students found for therapistCodeLeader: ${userRole}`);
+        // Build API URL
+        const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+        const fullUrl = `${apiUrl}/fetchstudents?therapistCodeLeader=${userRole}`;
+
+        // Fetch student data
+        const response = await fetch(fullUrl, {
+          method: "GET",
+          headers: {
+            Authorization: token,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch students: ${response.status} ${response.statusText}`
+          );
+        }
+
+        const data = await response.json();
+        console.log("Fetched students data:", data);
+
+        // Update state with fetched student codes
+        const studentCodes = data.unique_student_codes || [];
+        setStudents(studentCodes);
+
+        if (studentCodes.length === 0) {
+          console.warn(`No students found for therapistCodeLeader: ${userRole}`);
+        }
+      } catch (error) {
+        console.error(
+          `Error fetching students for therapistCodeLeader: ${userRole}`,
+          error
+        );
       }
-
-    } catch (error) {
-      console.error('Error fetching students for therapistCodeLeader:', userRole, error);
-    }
-  };
+    },
+    [instance] // Dependencies for useCallback
+  );
 
   return { students, fetchStudents };
 };
