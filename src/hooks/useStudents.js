@@ -24,6 +24,7 @@ const useStudents = () => {
         throw new Error('Failed to fetch students');
       }
 
+      console.log("usesSudents.js: response - ", response);
       const data = await response.json();
       console.log('Fetched students data:', data);
 
