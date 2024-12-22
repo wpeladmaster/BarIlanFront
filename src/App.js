@@ -18,7 +18,7 @@ const App = () => {
   const [userToken, setUserToken] = useState([]);
   const [groupNames, setGroupNames] = useState([]);
 
-  const loginRequest = { scopes: ["user_impersonation", "email", "openid", "User.Read"] };
+  const loginRequest = { scopes: ["email", "openid", "User.Read"] };
 
   useEffect(() => {
     const checkSession = async () => {
@@ -57,7 +57,7 @@ const App = () => {
         // Token acquisition
         try {
           const tokenResponse = await instance.acquireTokenSilent({
-            scopes: ["user_impersonation", "email", "openid", "User.Read"]
+            scopes: ["email", "openid", "User.Read"]
           });
           const token = tokenResponse.accessToken;
   
@@ -99,7 +99,7 @@ const App = () => {
       const email = loginResponse.account.username.split('@')[0];
       setUserName(loginResponse.account.name || loginResponse.account.username);
 
-      const token = (await instance.acquireTokenSilent({ scopes: ["user_impersonation", "email", "openid", "User.Read"] })).accessToken;
+      const token = (await instance.acquireTokenSilent({ scopes: ["email", "openid", "User.Read"] })).accessToken;
       console.log("App.js: Token acquired post-login.");
 
       const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
