@@ -9,10 +9,9 @@ import usePatients from "../hooks/usePatients";
 import useVideos from "../hooks/useVideos";
 import VideoModal from "./VideoModal";
 import Loader from "./Loader";
-//import fetchGroupNames from "../utils/fetchGroupNames";
 import "../style/HomePage.scss";
 
-const HomePage = ({ userRole, userCustomId }) => {
+const HomePage = ({ userRole, isAuthenticated }) => {
   const { instance } = useMsal();
   const [instructors, setInstructors] = useState([]);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
@@ -34,8 +33,8 @@ const HomePage = ({ userRole, userCustomId }) => {
 
     useEffect(() => {
     console.log('userRole:', userRole);
-    console.log('userCustomId:', userCustomId);
-  }, [userRole, userCustomId]);
+    console.log('isAuthenticated:', isAuthenticated);
+  }, [userRole, isAuthenticated]);
 
   // Memoize user roles to avoid recalculating on every render
   const isAdmin = useMemo(() => userRole.includes('Admins'), [userRole]);
@@ -50,7 +49,6 @@ const HomePage = ({ userRole, userCustomId }) => {
   useEffect(() => {
     if (!isAdmin) return;
 
-    
     const fetchInstructors = async () => {
       console.log("HomePage.js: Fetching instructors...");
       setLoadingInstructors(true);
@@ -96,26 +94,25 @@ const HomePage = ({ userRole, userCustomId }) => {
       }
     };
     
-
     fetchInstructors();
   }, [instance, isAdmin]);
 
 
   // Effect for fetching students (only for Instructor users)
   useEffect(() => {
-    if (isInstructor && userCustomId) {
+    if (isInstructor && isAuthenticated) {
       setLoadingStudents(true);
-      fetchStudents(userCustomId);
+      fetchStudents(isAuthenticated);
     }
-  }, [isInstructor, userCustomId]);
+  }, [isInstructor, isAuthenticated]);
 
   // Effect for fetching patients (only for Student users)
   useEffect(() => {
-    if (isStudent && userCustomId) {
+    if (isStudent && isAuthenticated) {
       setLoadingPatients(true);
-      fetchPatients(userCustomId);
+      fetchPatients(isAuthenticated);
     }
-  }, [isStudent, userCustomId]);
+  }, [isStudent, isAuthenticated]);
 
   // Effect for handling video tab setup
   useEffect(() => {

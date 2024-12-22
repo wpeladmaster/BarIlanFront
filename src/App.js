@@ -145,7 +145,7 @@ const App = () => {
         />
         <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
-          <Route path="/homepage" element={isAuthenticated ? <HomePage userToken={userToken} userRole={userRole} groupNames={groupNames} /> : <Navigate to="/" />} />
+          <Route path="/homepage" element={isAuthenticated ? <HomePage isAuthenticated={isAuthenticated} userRole={userRole} /> : <Navigate to="/" />} />
           <Route path="/admin-search" element={isAuthenticated && userRole.includes('Admins') ? <AdminSearch groupNames={groupNames} /> : <Navigate to="/" />} />
         </Routes>
         <Footer />
