@@ -113,11 +113,18 @@ const App = () => {
   const handleLogout = async () => {
     try {
       console.log("App.js: Logging out...");
-      await instance.logoutPopup({ postLogoutRedirectUri: window.location.origin });
+      await instance.logoutPopup({ 
+        postLogoutRedirectUri: window.location.origin,
+        account: instance.getActiveAccount()
+      });
       setIsAuthenticated(false);
       setUserName('');
       setUserRole([]);
       setGroupNames([]);
+
+      localStorage.clear();
+      sessionStorage.clear();
+      
       console.log("App.js: Logout successful.");
     } catch (error) {
       console.error("App.js: Logout error:", error);
