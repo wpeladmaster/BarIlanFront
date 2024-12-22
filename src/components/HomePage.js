@@ -21,7 +21,6 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
   const [selectedSession, setSelectedSession] = useState(null);
   const [activeTab, setActiveTab] = useState(null);
   const [videoTimes, setVideoTimes] = useState({});
-
   const [loadingInstructors, setLoadingInstructors] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [loadingPatients, setLoadingPatients] = useState(false);
@@ -37,14 +36,13 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
     console.log('isAuthenticated:', isAuthenticated);
   }, [userRole, isAuthenticated, groupNames]);
 
-  // Memoize user roles to avoid recalculating on every render
   const isAdmin = useMemo(() => groupNames.includes('Admins'), [groupNames]);
   const isInstructor = useMemo(() => groupNames.includes('Supervisers'), [groupNames]);
   const isStudent = useMemo(() => groupNames.includes('Therapists'), [groupNames]);
 
   useEffect(() => {
     if (!isAdmin) return;
-    
+
     const fetchInstructors = async () => {
       try {
         const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
@@ -62,15 +60,11 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
           const errorText = await response.text();
           console.error("instructors: Response error text:", errorText);
           if (response.status === 403) {
-            throw new Error(
-              "Authorization error: Ensure your token has correct permissions"
-            );
+            throw new Error("Authorization error: Ensure your token has correct permissions");
           }
-          throw new Error(
-            `Failed to fetch instructors: ${response.statusText} (${response.status})`
-          );
+          throw new Error(`Failed to fetch instructors: ${response.statusText} (${response.status})`);
         }
-    
+
         const data = await response.json();
         setInstructors(data.unique_instructors_codes || []);
         setLoadingInstructors(false);
@@ -81,7 +75,7 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
         setLoadingInstructors(false);
       }
     };
-    
+
     fetchInstructors();
   }, [instance, isAdmin]);
 
@@ -94,10 +88,9 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
         setLoadingStudents(false);
       }
     };
-  
+
     loadStudents();
   }, [isInstructor, isAuthenticated, userRole, fetchStudents]);
-  
 
   useEffect(() => {
     const loadPatients = async () => {
@@ -108,11 +101,10 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
         setLoadingPatients(false);
       }
     };
-  
+
     loadPatients();
   }, [isStudent, isAuthenticated, userRole, fetchPatients]);
 
-  // Effect for handling video tab setup
   useEffect(() => {
     if (selectedVideo && groupedVideos[selectedSession]) {
       const sessionVideos = groupedVideos[selectedSession];
@@ -134,7 +126,6 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
     setSelectedStudent(null);
     setSelectedPatient(null);
     setLoadingStudents(true);
-    console.log('instructorCode:', instructorCode);
     await fetchStudents(instructorCode);
     setLoadingStudents(false);
   };
@@ -157,9 +148,6 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
   const handleVideoClick = (video) => {
     setSelectedVideo(video);
     setSelectedSession(video.sessionName || '');
-    // Reset active tab to the first video in the session (if applicable)
-    const sessionVideos = groupedVideos[video.sessionName] || [];
-    setActiveTab(sessionVideos.length ? sessionVideos[0].fullVideoName : '');
   };
 
   return (
