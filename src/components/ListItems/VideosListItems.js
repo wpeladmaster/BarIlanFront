@@ -17,6 +17,10 @@ const VideosListItems = ({ videos = [], onVideoClick }) => (
                   <dt>Session Name:</dt>
                   <dd>{video.uniqueSessionName}</dd>
                 </div>
+                <div className='detail'>
+                  <dt>Meeting Number:</dt>
+                  <dd>{video.roomNum}</dd>
+                </div>
                 {video.date && video.date !== 'unknown' && (
                   <div className='detail'>
                     <dt>Date:</dt>

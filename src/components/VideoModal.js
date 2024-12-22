@@ -67,6 +67,12 @@ const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSe
                               <dd>{new Date(video.date).toLocaleDateString('he-IL')}</dd>
                           </div>
                           )}
+                        {video.time && video.time !== 'unknown' && (
+                          <div className='detail'>
+                              <dt>Time:</dt>
+                              <dd>{new Date(video.time).toLocaleDateString('he-IL')}</dd>
+                          </div>
+                          )}
                           <div className='detail'>
                             <dt>Patient Code:</dt>
                             <dd>{video.patientCode}</dd>

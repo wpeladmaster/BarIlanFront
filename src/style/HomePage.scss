@@ -231,12 +231,13 @@
                             }
                             dl {
                                 flex: 0 1 50%;
-                                &:first-of-type {
-                                    margin-bottom: 0.8rem;
-                                }
-                                &:last-of-type {
-                                    margin-top: 0;
-                                }
+                                margin-block: 0;
+                                // &:first-of-type {
+                                //     margin-bottom: 0.8rem;
+                                // }
+                                // &:last-of-type {
+                                //     margin-top: 0;
+                                // }
                             }
                         }
                         h4 {
