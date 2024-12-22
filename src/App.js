@@ -18,7 +18,7 @@ const App = () => {
   const [userToken, setUserToken] = useState([]);
   const [groupNames, setGroupNames] = useState([]);
 
-  const loginRequest = { scopes: [["api://saml_barilan/user_impersonation/.default"]] };
+  const loginRequest = { scopes: ["api://saml_barilan/user_impersonation/.default"] };
 
   useEffect(() => {
     const checkSession = async () => {
