@@ -27,7 +27,7 @@ const usePatients = () => {
       const response = await fetch(fullUrl, {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: token,
           "Content-Type": "application/json",
         },
       });
