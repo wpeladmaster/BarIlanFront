@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSession, activeTab, setActiveTab, handleTimeUpdate }) => {
-  // Always call hooks at the top level
+  const [fetchedVideoData, setFetchedVideoData] = useState(null); // State for video data
+
   const sessionVideos = useMemo(() => {
     return groupedVideos[selectedSession] || [];
   }, [groupedVideos, selectedSession]);
@@ -12,10 +13,28 @@ const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSe
     }
   }, [sessionVideos, activeTab, setActiveTab]);
 
+  useEffect(() => {
+    if (activeTab) {
+      fetchVideoData(activeTab);
+    }
+  }, [activeTab]);
+
+  const fetchVideoData = (tab) => {
+    // Simulating a fetch request for video data based on the tab
+    const video = sessionVideos.find((video) => video.fullVideoName === tab);
+    if (video) {
+      // Simulate asynchronous data fetch
+      setTimeout(() => {
+        setFetchedVideoData(video);
+      }, 300); // Simulated delay
+    }
+  };
+
   if (!selectedVideo) return null;
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
+    setFetchedVideoData(null); // Clear data until the fetch is complete
   };
 
   return (
@@ -34,70 +53,68 @@ const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSe
           ))}
         </div>
         <div className="tab-content">
-          {sessionVideos.map((video) => (
-            video.fullVideoName === activeTab && (
-              <div key={video.fileKey}>
-                {video.s3Url ? (
-                  <>
-                    <video
-                      width="560"
-                      height="315"
-                      src={video.s3Url}
-                      controls
-                      onTimeUpdate={(e) => handleTimeUpdate(video.fileKey, e.target.currentTime)}
-                    ></video>
-                    <div className="video-details">
-                      <h4>Session Details:</h4>
-                      <div className='lists-wrapper'>
-                        <dl>
-                          <div className='detail'>
-                            <dt>Unique Session Name:</dt>
-                            <dd>{video.uniqueSessionName}</dd>
-                          </div>
-                          <div className='detail'>
-                            <dt>Camera:</dt>
-                            <dd>{video.cameraName}</dd>
-                          </div>
-                          <div className='detail'>
-                            <dt>Meeting Number:</dt>
-                            <dd>{video.roomNum}</dd>
-                          </div>
-                          <div className='detail'>
-                            <dt>Room Number:</dt>
-                            <dd>{video.meetingNum}</dd>
-                          </div>
-                        </dl>
-                        <dl>
-                          {video.date && video.date !== 'unknown' && (
-                            <div className='detail'>
-                              <dt>Date:</dt>
-                              <dd>{new Date(video.date).toLocaleDateString('he-IL')}</dd>
-                            </div>
-                          )}
-                          {video.time && video.time !== 'unknown' && (
-                            <div className='detail'>
-                              <dt>Time:</dt>
-                              <dd>{video.time}</dd>
-                            </div>
-                          )}
-                          <div className='detail'>
-                            <dt>Patient Code:</dt>
-                            <dd>{video.patientCode}</dd>
-                          </div>
-                          <div className='detail'>
-                            <dt>Therapist Code:</dt>
-                            <dd>{video.therapistCode}</dd>
-                          </div>
-                        </dl>
+          {fetchedVideoData ? (
+            fetchedVideoData.s3Url ? (
+              <>
+                <video
+                  width="560"
+                  height="315"
+                  src={fetchedVideoData.s3Url}
+                  controls
+                  onTimeUpdate={(e) => handleTimeUpdate(fetchedVideoData.fileKey, e.target.currentTime)}
+                ></video>
+                <div className="video-details">
+                  <h4>Session Details:</h4>
+                  <div className="lists-wrapper">
+                    <dl>
+                      <div className="detail">
+                        <dt>Unique Session Name:</dt>
+                        <dd>{fetchedVideoData.uniqueSessionName}</dd>
                       </div>
-                    </div>
-                  </>
-                ) : (
-                  <p>Session not available.</p>
-                )}
-              </div>
+                      <div className="detail">
+                        <dt>Camera:</dt>
+                        <dd>{fetchedVideoData.cameraName}</dd>
+                      </div>
+                      <div className="detail">
+                        <dt>Meeting Number:</dt>
+                        <dd>{fetchedVideoData.roomNum}</dd>
+                      </div>
+                      <div className="detail">
+                        <dt>Room Number:</dt>
+                        <dd>{fetchedVideoData.meetingNum}</dd>
+                      </div>
+                    </dl>
+                    <dl>
+                      {fetchedVideoData.date && fetchedVideoData.date !== 'unknown' && (
+                        <div className="detail">
+                          <dt>Date:</dt>
+                          <dd>{new Date(fetchedVideoData.date).toLocaleDateString('he-IL')}</dd>
+                        </div>
+                      )}
+                      {fetchedVideoData.time && fetchedVideoData.time !== 'unknown' && (
+                        <div className="detail">
+                          <dt>Time:</dt>
+                          <dd>{fetchedVideoData.time}</dd>
+                        </div>
+                      )}
+                      <div className="detail">
+                        <dt>Patient Code:</dt>
+                        <dd>{fetchedVideoData.patientCode}</dd>
+                      </div>
+                      <div className="detail">
+                        <dt>Therapist Code:</dt>
+                        <dd>{fetchedVideoData.therapistCode}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p>Session not available.</p>
             )
-          ))}
+          ) : (
+            <p>Loading video data...</p>
+          )}
         </div>
       </div>
     </div>
