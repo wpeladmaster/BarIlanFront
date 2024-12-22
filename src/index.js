@@ -24,6 +24,7 @@ const msalConfig = {
       logLevel: LogLevel.Error,
       piiLoggingEnabled: false,
     },
+    navigateToLoginRequestUrl: false,
   },
 };
 
