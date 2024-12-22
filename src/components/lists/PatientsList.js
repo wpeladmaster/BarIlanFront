@@ -9,11 +9,12 @@ const PatientsList = ({ patients, onClickFromAdminPatient, onClickFromHomePatien
   );
 
   const handlePatientClick = (studentCode) => {
+    console.log('onClickFromHomePatient:', onClickFromHomePatient);
     // Call the relevant handler based on where the click originated
     if (onClickFromAdminPatient) {
       onClickFromAdminPatient(studentCode);
     }
-    if (onClickFromHomePatient) {
+    if (typeof onClickFromHomePatient === 'function') {
       onClickFromHomePatient(studentCode);
     }
   };

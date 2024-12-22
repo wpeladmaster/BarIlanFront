@@ -143,17 +143,7 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
     setSelectedPatient(patientCode);
     setSelectedVideo(null);
     setLoadingVideos(true);
-  
-    // Call the fetchVideos function and handle state updates after it resolves
-    fetchVideos(patientCode)
-      .then((videos) => {
-        console.log('Fetched videos:', videos); // Ensure you see the response
-        setLoadingVideos(false); // Set loading to false when fetch completes
-      })
-      .catch((error) => {
-        console.error('Error fetching videos:', error); // Log any error from fetchVideos
-        setLoadingVideos(false); // Set loading to false even if there's an error
-      });
+    fetchVideos(patientCode).finally(() => setLoadingVideos(false));
   };
   
 
