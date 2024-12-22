@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMsal } from "@azure/msal-react";
 import { groupVideosBySession } from '../utils/videoUtils';
 
@@ -14,15 +14,17 @@ const useVideos = () => {
       console.warn("fetchVideos: patientCode is undefined or null");
       return;
     }
-  
+
     setLoading(true);
     setError(null);
-  
+
     try {
-      const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
+      const token = (await instance.acquireTokenSilent({ 
+        scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] 
+      })).accessToken;
       const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
       const fullUrl = `${apiUrl}/fetchvideos?patientCode=${patientCode}`;
-  
+
       const response = await fetch(fullUrl, {
         method: 'GET',
         headers: {
@@ -30,13 +32,13 @@ const useVideos = () => {
           'Content-Type': 'application/json',
         },
       });
-  
+
       if (!response.ok) {
         throw new Error(`Failed to fetch videos: ${response.statusText}`);
       }
-  
+
       const data = await response.json();
-      const videoList = data.unique_videos_list.map((item) => ({
+      const newVideoList = data.unique_videos_list.map((item) => ({
         fullVideoName: item.fullVideoName,
         fileKey: item.fileKey,
         s3Url: item.s3Url,
@@ -49,19 +51,20 @@ const useVideos = () => {
         date: item.date,
         time: item.time,
       }));
-  
-      if (JSON.stringify(videoList) !== JSON.stringify(videoList)) {
-        setVideos(videoList);
+
+      // Check if video list is different before updating the state
+      if (JSON.stringify(newVideoList) !== JSON.stringify(videoList)) {
+        setVideos(newVideoList);
       }
-  
-      // Group videos and update state only if they change
-      const grouped = groupVideosBySession(videoList);
-      if (JSON.stringify(groupedVideos) !== JSON.stringify(grouped)) {
+
+      // Group videos by session and update state if necessary
+      const grouped = groupVideosBySession(newVideoList);
+      if (JSON.stringify(grouped) !== JSON.stringify(groupedVideos)) {
         setGroupedVideos(grouped);
       }
-  
+
       console.log('Fetched and grouped videos:', grouped);
-  
+
     } catch (error) {
       console.error('Error fetching videos:', error);
       setError(error.message);
@@ -69,7 +72,6 @@ const useVideos = () => {
       setLoading(false);
     }
   };
-  
 
   return { videoList, fetchVideos, groupedVideos, loading, error };
 };
