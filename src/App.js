@@ -60,15 +60,11 @@ const App = () => {
             scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"]
           });
           const token = tokenResponse.accessToken;
-  
-          console.log("App.js: Token acquired successfully:", token);
-  
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-          console.log("App.js: API URL:", apiUrl);
-  
           const groups = await fetchGroupNames(apiUrl, token, email);
           console.log("App.js: Groups fetched:", groups);
-  
+          setIsLoading(false);
+
           setGroupNames(groups);
           setUserRole(groups);
           setUserToken(token);

@@ -57,8 +57,6 @@ const HomePage = ({ userRole, isAuthenticated }) => {
         const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
         const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
         const fullUrl = `${apiUrl}/fetchinstructors`;
-        console.log("Homepage instructors fullUrl: ", fullUrl);
-        console.log("Homepage instructors token: ", token);
         const response = await fetch(fullUrl, {
           method: "GET",
           headers: {
@@ -66,8 +64,6 @@ const HomePage = ({ userRole, isAuthenticated }) => {
             "Content-Type": "application/json",
           },
         });
-    
-        console.log("Homepage instructors: Response status:", response.status);
     
         if (!response.ok) {
           const errorText = await response.text();
@@ -80,12 +76,13 @@ const HomePage = ({ userRole, isAuthenticated }) => {
           throw new Error(
             `Failed to fetch instructors: ${response.statusText} (${response.status})`
           );
+          setLoadingInstructors(false);
         }
     
         const data = await response.json();
-        console.log("HomePage.js: Instructors fetched:", data);
-    
         setInstructors(data.unique_instructors_codes || []);
+        setLoadingInstructors(false);
+
       } catch (error) {
         console.error("HomePage.js: Error fetching instructors:", error.message);
         alert(`Error: ${error.message}`);
