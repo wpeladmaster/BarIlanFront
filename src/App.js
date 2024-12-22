@@ -31,8 +31,6 @@ const App = () => {
   
       try {
         const allAccounts = instance.getAllAccounts();
-        console.log("App.js: All accounts:", allAccounts);
-
         if (!allAccounts.length) {
           console.warn("App.js: No accounts found.");
           setIsLoading(false);

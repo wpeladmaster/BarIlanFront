@@ -12,7 +12,7 @@ const msalConfig = {
   },
   cache: {
     cacheLocation: "sessionStorage",
-    storeAuthStateInCookie: false,
+    storeAuthStateInCookie: true,
   },
   system: {
     loggerOptions: {
@@ -21,7 +21,7 @@ const msalConfig = {
           console.log(message);
         }
       },
-      logLevel: LogLevel.Info,
+      logLevel: LogLevel.Error,
       piiLoggingEnabled: false,
     },
   },
