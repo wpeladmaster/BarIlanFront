@@ -1,40 +1,39 @@
 import React from 'react';
 
 const VideosListItems = ({ videos = [], onVideoClick }) => (
-  
-    <ul>
-      {
-        videos.map((video) => (
-          <li key={`${video.uniqueSessionName}-${video.fileKey}`} onClick={() => onVideoClick(video.patientCode, video)} className='item'>
-            <div className="folder-img"></div>
-            <div className="video-details">
-              <dl>
+  <ul>
+    {
+      videos.map((video) => (
+        <li key={`${video.uniqueSessionName}-${video.fileKey}`} onClick={() => onVideoClick(video)} className='item'>
+          <div className="folder-img"></div>
+          <div className="video-details">
+            <dl>
+              <div className='detail'>
+                <dt>Patient Code:</dt>
+                <dd>{video.patientCode}</dd>
+              </div>
+              <div className='detail'>
+                <dt>Session Name:</dt>
+                <dd>{video.uniqueSessionName}</dd>
+              </div>
+              <div className='detail'>
+                <dt>Meeting Number:</dt>
+                <dd>{video.roomNum}</dd>
+              </div>
+              {video.date && video.date !== 'unknown' && (
                 <div className='detail'>
-                  <dt>Patient Code:</dt>
-                  <dd>{video.patientCode}</dd>
+                  <dt>Date:</dt>
+                  <dd>{new Date(video.date).toLocaleDateString('he-IL')}</dd>
                 </div>
-                <div className='detail'>
-                  <dt>Session Name:</dt>
-                  <dd>{video.uniqueSessionName}</dd>
-                </div>
-                <div className='detail'>
-                  <dt>Meeting Number:</dt>
-                  <dd>{video.roomNum}</dd>
-                </div>
-                {video.date && video.date !== 'unknown' && (
-                  <div className='detail'>
-                    <dt>Date:</dt>
-                    <dd>{new Date(video.date).toLocaleDateString('he-IL')}</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
-          </li>
-        ))
-      }
-    </ul>
-    
+              )}
+            </dl>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
 );
+
 
 export default VideosListItems;
 
