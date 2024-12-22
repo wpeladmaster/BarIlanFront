@@ -45,6 +45,8 @@ const App = () => {
           console.warn("App.js: No active account set.");
           setIsLoading(false);
           return;
+        } else {
+          setIsAuthenticated(true);
         }
   
         setUserName(account.name || account.username);
