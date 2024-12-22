@@ -2,16 +2,16 @@ import { useState, useEffect } from 'react';
 import { useMsal } from "@azure/msal-react";
 import { groupVideosBySession } from '../utils/videoUtils';
 
-const useVideos = () => {
+const useVideos = (patientCode) => { // Add patientCode as a parameter
   const { instance } = useMsal();
   const [videoList, setVideos] = useState([]);
   const [groupedVideos, setGroupedVideos] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch videos once, unless patientCode changes
+  // Fetch videos when patientCode changes
   useEffect(() => {
-    const fetchVideos = async (patientCode = null) => {
+    const fetchVideos = async () => {
       if (!patientCode) {
         console.warn("fetchVideos: patientCode is undefined or null");
         return;
@@ -52,23 +52,12 @@ const useVideos = () => {
           time: item.time,
         }));
 
-        // Set the videos only if they change
-        setVideos((prevVideos) => {
-          if (JSON.stringify(prevVideos) !== JSON.stringify(videoList)) {
-            return videoList;
-          }
-          return prevVideos;
-        });
+        // Update video list
+        setVideos(videoList);
 
         // Group the videos based on sessions
         const grouped = groupVideosBySession(videoList);
-
-        setGroupedVideos((prevGroupedVideos) => {
-          if (JSON.stringify(prevGroupedVideos) !== JSON.stringify(grouped)) {
-            return grouped;
-          }
-          return prevGroupedVideos;
-        });
+        setGroupedVideos(grouped);
 
       } catch (error) {
         console.error('Error fetching videos:', error);
@@ -78,8 +67,8 @@ const useVideos = () => {
       }
     };
 
-    fetchVideos(); // Call the fetch function on initial mount or when patientCode changes
-  }, [instance, setVideos, setGroupedVideos]); // Dependencies: only re-fetch when necessary (e.g., patientCode)
+    fetchVideos(); // Call the fetch function whenever patientCode changes
+  }, [patientCode, instance]); // Now it re-runs every time patientCode changes
 
   return { videoList, groupedVideos, loading, error };
 };
