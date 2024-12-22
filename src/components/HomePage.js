@@ -94,7 +94,7 @@ const HomePage = ({ userRole, isAuthenticated }) => {
       fetchStudents(isAuthenticated);
       setLoadingStudents(false);
     }
-  }, [isInstructor, isAuthenticated, fetchStudents]);
+  }, [isInstructor, isAuthenticated]);
 
   // Effect for fetching patients (only for Student users)
   useEffect(() => {
