@@ -12,7 +12,7 @@ import fetchGroupNames from './utils/fetchGroupNames';
 const App = () => {
   const { instance } = useMsal();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState([]);
   const [userToken, setUserToken] = useState([]);
@@ -26,14 +26,13 @@ const App = () => {
   
       if (!instance) {
         console.warn("App.js: MSAL instance is not initialized.");
-        setIsLoading(false);
         return;
       }
   
       try {
         const allAccounts = instance.getAllAccounts();
         console.log("App.js: All accounts:", allAccounts);
-  
+        setIsLoading(true);
         if (!allAccounts.length) {
           console.warn("App.js: No accounts found.");
           setIsLoading(false);
@@ -50,7 +49,6 @@ const App = () => {
           return;
         }
   
-        setIsAuthenticated(true);
         setUserName(account.name || account.username);
         const email = account.username.split('@')[0];
   
@@ -63,17 +61,18 @@ const App = () => {
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
           const groups = await fetchGroupNames(apiUrl, token, email);
           console.log("App.js: Groups fetched:", groups);
-          setIsLoading(false);
-
+          
           setGroupNames(groups);
           setUserRole(groups);
           setUserToken(token);
         } catch (tokenError) {
           console.error("App.js: Token acquisition error:", tokenError);
+          setIsLoading(false);
         }
   
       } catch (sessionError) {
         console.error("App.js: Error during session check:", sessionError);
+        setIsLoading(false);
       } finally {
         setIsLoading(false);
       }
