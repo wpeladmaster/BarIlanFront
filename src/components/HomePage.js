@@ -56,11 +56,7 @@ const HomePage = ({ userRole, userCustomId }) => {
       setLoadingInstructors(true);
       try {
 
-        const tokenResponse = await instance.acquireTokenSilent({
-          scopes: ["User.Read"]
-        });
-        const token = tokenResponse.accessToken;
-
+        const token = (await instance.acquireTokenSilent({ scopes: ["email", "openid", "User.Read"] })).accessToken;
         const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
         const fullUrl = `${apiUrl}/fetchinstructors`;
         console.log("Homepage instructors fullUrl: ", fullUrl);
