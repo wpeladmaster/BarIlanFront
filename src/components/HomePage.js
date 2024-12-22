@@ -56,7 +56,7 @@ const HomePage = ({ userRole, userCustomId }) => {
       setLoadingInstructors(true);
       try {
 
-        const token = (await instance.acquireTokenSilent({ scopes: ["api://saml_barilan/user_impersonation/.default"] })).accessToken;
+        const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation"] })).accessToken;
         const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
         const fullUrl = `${apiUrl}/fetchinstructors`;
         console.log("Homepage instructors fullUrl: ", fullUrl);
