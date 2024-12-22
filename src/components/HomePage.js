@@ -41,14 +41,9 @@ const HomePage = ({ userRole, isAuthenticated }) => {
   const isInstructor = useMemo(() => userRole.includes('Supervisers'), [userRole]);
   const isStudent = useMemo(() => userRole.includes('Therapists'), [userRole]);
 
-
-  console.log("HomePage.js: userRole - ", userRole);
-  console.log("HomePage.js: isAdmin - ", isAdmin);
-  
-
   useEffect(() => {
     if (!isAdmin) return;
-    setLoadingInstructors(true);
+    
     const fetchInstructors = async () => {
       try {
 
@@ -62,7 +57,7 @@ const HomePage = ({ userRole, isAuthenticated }) => {
             "Content-Type": "application/json",
           },
         });
-        setLoadingInstructors(false);
+        setLoadingInstructors(true);
         if (!response.ok) {
           const errorText = await response.text();
           console.error("instructors: Response error text:", errorText);

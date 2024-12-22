@@ -32,7 +32,7 @@ const App = () => {
       try {
         const allAccounts = instance.getAllAccounts();
         console.log("App.js: All accounts:", allAccounts);
-        setIsLoading(true);
+
         if (!allAccounts.length) {
           console.warn("App.js: No accounts found.");
           setIsLoading(false);
@@ -60,7 +60,7 @@ const App = () => {
           const token = tokenResponse.accessToken;
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
           const groups = await fetchGroupNames(apiUrl, token, email);
-          console.log("App.js: Groups fetched:", groups);
+          setIsLoading(true);
           
           setGroupNames(groups);
           setUserRole(groups);
