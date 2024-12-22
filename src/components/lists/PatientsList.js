@@ -20,8 +20,6 @@ const PatientsList = ({ patients, onClickFromAdminPatient, onClickFromHomePatien
 
   return (
     <div className="list-wrap patients">
-
-
       <div className='title-wrap'>
         <h2>Patients</h2>
         <span>({filteredPatients.length})</span>
