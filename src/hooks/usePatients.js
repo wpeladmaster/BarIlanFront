@@ -5,12 +5,12 @@ const usePatients = () => {
   const { instance } = useMsal();
   const [patients, setPatients] = useState([]);
 
-  const fetchPatients = async (therapistCodeStudent) => {
+  const fetchPatients = async (userRole) => {
 
     try {
       const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
       const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-      const fullUrl = `${apiUrl}/fetchpatients?therapistCodeStudent=${therapistCodeStudent}`;
+      const fullUrl = `${apiUrl}/fetchpatients?therapistCodeStudent=${userRole}`;
 
       const response = await fetch(fullUrl, {
         method: 'GET',
@@ -31,7 +31,7 @@ const usePatients = () => {
       setPatients(patientCodes);
 
       if (patientCodes.length === 0) {
-        console.warn(`No patients found for therapistCodeStudent: ${therapistCodeStudent}`);
+        console.warn(`No patients found for therapistCodeStudent: ${userRole}`);
       }
 
     } catch (error) {
