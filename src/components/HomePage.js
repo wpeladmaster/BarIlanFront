@@ -97,9 +97,10 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
       }
     };
   
-    loadStudents();
-  }, [isInstructor, isAuthenticated, userRole]);
-
+    loadStudents(); // Async function to handle `await` properly
+    // Note: fetchStudents is stable because it's memoized with useCallback
+  }, [isInstructor, isAuthenticated, userRole, fetchStudents]);
+  
 
   useEffect(() => {
     const loadPatients = async () => {
@@ -111,8 +112,10 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
       }
     };
   
-    loadPatients();
+    loadPatients(); // Async function to handle `await` properly
+    // Note: fetchPatients is stable because it's memoized with useCallback
   }, [isStudent, isAuthenticated, userRole, fetchPatients]);
+  
 
   // Effect for handling video tab setup
   useEffect(() => {
