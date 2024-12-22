@@ -63,7 +63,7 @@ const App = () => {
           setIsLoading(true);
           
           setGroupNames(groups);
-          setUserRole(groups);
+          setUserRole(email);
           setUserToken(token);
         } catch (tokenError) {
           console.error("App.js: Token acquisition error:", tokenError);
@@ -104,7 +104,7 @@ const App = () => {
 
       console.log("App.js: Groups fetched post-login:", groups);
       setGroupNames(groups);
-      setUserRole(groups);
+      setUserRole(email);
     } catch (error) {
       console.error("App.js: Login error:", error);
     }
@@ -140,7 +140,7 @@ const App = () => {
         />
         <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
-          <Route path="/homepage" element={isAuthenticated ? <HomePage isAuthenticated={isAuthenticated} userRole={userRole} /> : <Navigate to="/" />} />
+          <Route path="/homepage" element={isAuthenticated ? <HomePage isAuthenticated={isAuthenticated} groupNames={groupNames} userRole={userRole} /> : <Navigate to="/" />} />
           <Route path="/admin-search" element={isAuthenticated && userRole.includes('Admins') ? <AdminSearch groupNames={groupNames} /> : <Navigate to="/" />} />
         </Routes>
         <Footer />

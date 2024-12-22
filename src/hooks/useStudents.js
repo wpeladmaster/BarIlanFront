@@ -5,12 +5,12 @@ const useStudents = () => {
   const { instance } = useMsal();
   const [students, setStudents] = useState([]);
 
-  const fetchStudents = async (therapistCodeLeader = '') => {
+  const fetchStudents = async (userRole = '') => {
     try {
 
       const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
       const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-      const fullUrl = `${apiUrl}/fetchstudents?therapistCodeLeader=${therapistCodeLeader}`;
+      const fullUrl = `${apiUrl}/fetchstudents?therapistCodeLeader=${userRole}`;
 
       const response = await fetch(fullUrl, {
         method: 'GET',
@@ -32,11 +32,11 @@ const useStudents = () => {
       setStudents(studentCodes);
 
       if (studentCodes.length === 0) {
-        console.warn(`No students found for therapistCodeLeader: ${therapistCodeLeader}`);
+        console.warn(`No students found for therapistCodeLeader: ${userRole}`);
       }
 
     } catch (error) {
-      console.error('Error fetching students for therapistCodeLeader:', therapistCodeLeader, error);
+      console.error('Error fetching students for therapistCodeLeader:', userRole, error);
     }
   };
 

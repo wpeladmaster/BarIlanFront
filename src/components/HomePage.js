@@ -11,7 +11,7 @@ import VideoModal from "./VideoModal";
 import Loader from "./Loader";
 import "../style/HomePage.scss";
 
-const HomePage = ({ userRole, isAuthenticated }) => {
+const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
   const { instance } = useMsal();
   const [instructors, setInstructors] = useState([]);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
@@ -33,13 +33,14 @@ const HomePage = ({ userRole, isAuthenticated }) => {
 
     useEffect(() => {
     console.log('userRole:', userRole);
+    console.log('groupNames:', groupNames);
     console.log('isAuthenticated:', isAuthenticated);
-  }, [userRole, isAuthenticated]);
+  }, [userRole, isAuthenticated, groupNames]);
 
   // Memoize user roles to avoid recalculating on every render
-  const isAdmin = useMemo(() => userRole.includes('Admins'), [userRole]);
-  const isInstructor = useMemo(() => userRole.includes('Supervisers'), [userRole]);
-  const isStudent = useMemo(() => userRole.includes('Therapists'), [userRole]);
+  const isAdmin = useMemo(() => groupNames.includes('Admins'), [groupNames]);
+  const isInstructor = useMemo(() => groupNames.includes('Supervisers'), [groupNames]);
+  const isStudent = useMemo(() => groupNames.includes('Therapists'), [groupNames]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -91,19 +92,19 @@ const HomePage = ({ userRole, isAuthenticated }) => {
   useEffect(() => {
     if (isInstructor && isAuthenticated) {
       setLoadingStudents(true);
-      fetchStudents(isAuthenticated);
+      fetchStudents(userRole);
       setLoadingStudents(false);
     }
-  }, [isInstructor, isAuthenticated]);
+  }, [isInstructor, isAuthenticated, userRole]);
 
   // Effect for fetching patients (only for Student users)
   useEffect(() => {
     if (isStudent && isAuthenticated) {
       setLoadingPatients(true);
-      fetchPatients(isAuthenticated);
+      fetchPatients(userRole);
       setLoadingPatients(false);
     }
-  }, [isStudent, isAuthenticated]);
+  }, [isStudent, isAuthenticated, userRole]);
 
   // Effect for handling video tab setup
   useEffect(() => {
