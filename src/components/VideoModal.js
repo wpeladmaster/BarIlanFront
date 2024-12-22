@@ -6,7 +6,7 @@ const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSe
   
   // Initialize active tab only if there is no active tab yet (only the first time)
   useEffect(() => {
-    if (selectedVideo) {
+    if (selectedVideo && groupedVideos[selectedVideo.uniqueSessionName]) {
       const videoSession = groupedVideos[selectedVideo.uniqueSessionName];
       if (videoSession && videoSession.length > 0) {
         setActiveTab(videoSession[0].fullVideoName); // Set initial active tab
@@ -14,7 +14,9 @@ const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSe
     }
   }, [selectedVideo, groupedVideos]);
   
+  
   const handleTabChange = (tab) => {
+    console.log('Active tab changed:', tab);
     setActiveTab(tab); // Change the active tab based on user click
   };
 
