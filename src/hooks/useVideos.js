@@ -1,30 +1,20 @@
 import { useState } from 'react';
-import { PublicClientApplication } from '@azure/msal-browser';
+import { useMsal } from "@azure/msal-react";
 import { groupVideosBySession } from '../utils/videoUtils';
 
 const useVideos = () => {
+  const { instance } = useMsal();
   const [videoList, setVideos] = useState([]);
   const [groupedVideos, setGroupedVideos] = useState({});
-  const [loading, setLoading] = useState(false); // Add a loading state for better UX
-  const [error, setError] = useState(null); // Add an error state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const fetchVideos = async (patientCode = null) => {
     setLoading(true);
     setError(null);
 
     try {
-      const msalConfig = {
-        auth: {
-          clientId: "aadb3f2f-d35f-4080-bc72-2ee32b741120",
-          authority: "https://login.microsoftonline.com/352ed1fa-2f18-487f-a4cf-4804faa235c7/saml2",
-          redirectUri: "http://localhost:3000"
-        }
-      };
-      
-      const msalInstance = new PublicClientApplication(msalConfig);
-      const token = (await msalInstance.acquireTokenSilent({
-        scopes: ["api://your_api_app_id/access_as_user"] // Replace with your API's app ID URI
-      })).accessToken;
+      const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
       const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
       const fullUrl = `${apiUrl}/fetchvideos?patientCode=${patientCode}`;
 
@@ -44,7 +34,7 @@ const useVideos = () => {
       const videoList = data.unique_videos_list.map((item) => ({
         fullVideoName: item.fullVideoName,
         fileKey: item.fileKey,
-        s3Url: item.s3Url, // S3 signed URL for video access
+        s3Url: item.s3Url,
         meetingNum: item.meetingNum,
         roomNum: item.roomNum,
         cameraName: item.cameraName,
@@ -64,7 +54,7 @@ const useVideos = () => {
       
     } catch (error) {
       console.error('Error fetching videos:', error);
-      setError(error.message); // Capture any errors for display
+      setError(error.message);
     } finally {
       setLoading(false);
     }
