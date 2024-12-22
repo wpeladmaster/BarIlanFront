@@ -125,7 +125,7 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
         setActiveTab(sessionVideos[0].fullVideoName);
       }
     }
-  }, [selectedVideo, groupedVideos, selectedSession]);
+  }, [selectedVideo, groupedVideos, selectedSession, activeTab]);
 
   const handleTimeUpdate = (videoKey, currentTime) => {
     setVideoTimes((prev) => ({

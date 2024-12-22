@@ -10,26 +10,31 @@ const useVideos = () => {
   const [error, setError] = useState(null);
 
   const fetchVideos = async (patientCode = null) => {
+    if (!patientCode) {
+      console.warn("fetchVideos: patientCode is undefined or null");
+      return;
+    }
+  
     setLoading(true);
     setError(null);
-
+  
     try {
       const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
       const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
       const fullUrl = `${apiUrl}/fetchvideos?patientCode=${patientCode}`;
-
+  
       const response = await fetch(fullUrl, {
         method: 'GET',
         headers: {
-          'Authorization': token,
+          Authorization: token,
           'Content-Type': 'application/json',
-        }
+        },
       });
-
+  
       if (!response.ok) {
         throw new Error(`Failed to fetch videos: ${response.statusText}`);
       }
-
+  
       const data = await response.json();
       const videoList = data.unique_videos_list.map((item) => ({
         fullVideoName: item.fullVideoName,
@@ -44,14 +49,19 @@ const useVideos = () => {
         date: item.date,
         time: item.time,
       }));
-
-      setVideos(videoList);
-      console.log('Fetched videos:', videoList);
-
-      // Assuming you have a utility to group videos by session
+  
+      if (JSON.stringify(videoList) !== JSON.stringify(videoList)) {
+        setVideos(videoList);
+      }
+  
+      // Group videos and update state only if they change
       const grouped = groupVideosBySession(videoList);
-      setGroupedVideos(grouped);
-      
+      if (JSON.stringify(groupedVideos) !== JSON.stringify(grouped)) {
+        setGroupedVideos(grouped);
+      }
+  
+      console.log('Fetched and grouped videos:', grouped);
+  
     } catch (error) {
       console.error('Error fetching videos:', error);
       setError(error.message);
@@ -59,6 +69,7 @@ const useVideos = () => {
       setLoading(false);
     }
   };
+  
 
   return { videoList, fetchVideos, groupedVideos, loading, error };
 };
