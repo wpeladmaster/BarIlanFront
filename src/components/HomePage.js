@@ -139,6 +139,7 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
   };
 
   const handlePatientClick = async (patientCode) => {
+    if (selectedPatient === patientCode) return;
     console.log('Fetching videos for patient:', patientCode);
     setSelectedPatient(patientCode);
     setSelectedVideo(null);

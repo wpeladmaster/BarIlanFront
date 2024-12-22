@@ -15,15 +15,17 @@ const useVideos = (patientCode) => {
       console.warn("fetchVideos: patientCode is undefined or null");
       return;
     }
-
+  
     setLoading(true);
     setError(null);
-
+    setVideos([]); // Clear video list before fetching new data
+    setGroupedVideos({}); // Reset grouped videos before fetching new data
+  
     try {
       const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
       const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
       const fullUrl = `${apiUrl}/fetchvideos?patientCode=${patientCode}`;
-
+  
       const response = await fetch(fullUrl, {
         method: 'GET',
         headers: {
@@ -31,11 +33,11 @@ const useVideos = (patientCode) => {
           'Content-Type': 'application/json',
         },
       });
-
+  
       if (!response.ok) {
         throw new Error(`Failed to fetch videos: ${response.statusText}`);
       }
-
+  
       const data = await response.json();
       const videoList = data.unique_videos_list.map((item) => ({
         fullVideoName: item.fullVideoName,
@@ -50,11 +52,11 @@ const useVideos = (patientCode) => {
         date: item.date,
         time: item.time,
       }));
-
+  
       setVideos(videoList);
       const grouped = groupVideosBySession(videoList);
       setGroupedVideos(grouped);
-
+  
     } catch (error) {
       console.error('Error fetching videos:', error);
       setError(error.message);
@@ -62,6 +64,7 @@ const useVideos = (patientCode) => {
       setLoading(false);
     }
   };
+  
 
   // Effect hook to fetch videos when the patientCode changes
   useEffect(() => {
