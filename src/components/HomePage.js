@@ -87,24 +87,32 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
     fetchInstructors();
   }, [instance, isAdmin]);
 
-
-  // Effect for fetching students (only for Instructor users)
   useEffect(() => {
-    if (isInstructor && isAuthenticated) {
-      setLoadingStudents(true);
-      fetchStudents(userRole);
-      setLoadingStudents(false);
-    }
+    const loadStudents = async () => {
+      if (isInstructor && isAuthenticated && userRole) {
+        console.log("Fetching students for userRole:", userRole);
+        setLoadingStudents(true);
+        await fetchStudents(userRole);
+        setLoadingStudents(false);
+      }
+    };
+  
+    loadStudents();
   }, [isInstructor, isAuthenticated, userRole]);
 
-  // Effect for fetching patients (only for Student users)
+
   useEffect(() => {
-    if (isStudent && isAuthenticated) {
-      setLoadingPatients(true);
-      fetchPatients(userRole);
-      setLoadingPatients(false);
-    }
-  }, [isStudent, isAuthenticated, userRole]);
+    const loadPatients = async () => {
+      if (isStudent && isAuthenticated && userRole) {
+        console.log("Fetching patients for userRole:", userRole);
+        setLoadingPatients(true);
+        await fetchPatients(userRole);
+        setLoadingPatients(false);
+      }
+    };
+  
+    loadPatients();
+  }, [isStudent, isAuthenticated, userRole, fetchPatients]);
 
   // Effect for handling video tab setup
   useEffect(() => {

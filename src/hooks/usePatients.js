@@ -7,7 +7,13 @@ const usePatients = () => {
 
   const fetchPatients = async (userRole) => {
 
+    if (!userRole) {
+      console.warn("fetchPatients: userRole is undefined");
+      return;
+    }
+
     try {
+      console.log("Fetching patients for role:", userRole);
       const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
       const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
       const fullUrl = `${apiUrl}/fetchpatients?therapistCodeStudent=${userRole}`;
@@ -37,7 +43,6 @@ const usePatients = () => {
     } catch (error) {
       console.error('Error fetching patients:', error);
     }
-
 
   };
 

@@ -6,6 +6,12 @@ const useStudents = () => {
   const [students, setStudents] = useState([]);
 
   const fetchStudents = async (userRole = '') => {
+
+    if (!userRole) {
+      console.warn("fetchStudents: userRole is undefined");
+      return;
+    }
+
     try {
 
       const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
