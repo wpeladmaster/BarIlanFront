@@ -31,7 +31,7 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
   const { patients, fetchPatients } = usePatients();
   const { videoList, fetchVideos, groupedVideos } = useVideos();
 
-    useEffect(() => {
+  useEffect(() => {
     console.log('userRole:', userRole);
     console.log('groupNames:', groupNames);
     console.log('isAuthenticated:', isAuthenticated);
@@ -47,7 +47,6 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
     
     const fetchInstructors = async () => {
       try {
-
         const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
         const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
         const fullUrl = `${apiUrl}/fetchinstructors`;
@@ -70,7 +69,6 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
           throw new Error(
             `Failed to fetch instructors: ${response.statusText} (${response.status})`
           );
-
         }
     
         const data = await response.json();
@@ -97,8 +95,7 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
       }
     };
   
-    loadStudents(); // Async function to handle `await` properly
-    // Note: fetchStudents is stable because it's memoized with useCallback
+    loadStudents();
   }, [isInstructor, isAuthenticated, userRole, fetchStudents]);
   
 
@@ -112,10 +109,8 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
       }
     };
   
-    loadPatients(); // Async function to handle `await` properly
-    // Note: fetchPatients is stable because it's memoized with useCallback
+    loadPatients();
   }, [isStudent, isAuthenticated, userRole, fetchPatients]);
-  
 
   // Effect for handling video tab setup
   useEffect(() => {
@@ -162,6 +157,9 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
   const handleVideoClick = (video) => {
     setSelectedVideo(video);
     setSelectedSession(video.sessionName || '');
+    // Reset active tab to the first video in the session (if applicable)
+    const sessionVideos = groupedVideos[video.sessionName] || [];
+    setActiveTab(sessionVideos.length ? sessionVideos[0].fullVideoName : '');
   };
 
   return (
@@ -201,7 +199,6 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
         </div>
       )}
 
-
       {isAdmin && !selectedInstructor && (
         loadingInstructors ? <Loader /> : (
           <InstructorsList instructors={instructors} onClickFromHomeInstructor={handleInstructorClick} />
@@ -237,7 +234,6 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
           handleTimeUpdate={handleTimeUpdate}
         />
       )}
-
     </div>
   );
 };
