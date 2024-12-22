@@ -15,6 +15,7 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
       console.error("fetchGroupNames.js: Response error text:", errorText);
       throw new Error(`Failed to fetch groups: ${response.statusText} (${response.status})`);
     }
+    console.log("fetchGroupNames.js: response - ", response);
 
     const data = await response.json();
 
