@@ -10,15 +10,20 @@ const VideoModal = ({
   setActiveTab,
   handleTimeUpdate,
 }) => {
+  // Ensure selectedVideo and its properties are valid
   useEffect(() => {
-    if (selectedVideo) {
+    if (selectedVideo && selectedVideo.sessionName) {
       setSelectedSession(selectedVideo.sessionName);
       setActiveTab(selectedVideo.fullVideoName);
+    } else {
+      console.warn("selectedVideo or sessionName is invalid:", selectedVideo);
     }
   }, [selectedVideo, setSelectedSession, setActiveTab]);
 
+  // Return null if no video is selected
   if (!selectedVideo) return null;
 
+  // Handle tab changes for switching videos
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
