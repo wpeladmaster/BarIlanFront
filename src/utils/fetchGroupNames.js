@@ -20,7 +20,7 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
     console.log("group data: ", data);
     
     // Extract and normalize the groups
-    const groups = data.group || '';
+    const groups = data.groups_names || '';
     console.log("groups: ", groups);
     const normalizedGroups = groups.replace(/[{}"]/g, '');
     console.log("normalizedGroups: ", normalizedGroups);
