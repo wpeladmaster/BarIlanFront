@@ -20,11 +20,14 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
     console.log("group data: ", data);
     
     // Extract and normalize the groups
-    const groups = data.group || '';
-    console.log("groups: ", groups);
-    const normalizedGroups = groups.replace(/[{}"]/g, '');
-    console.log("normalizedGroups: ", normalizedGroups);
-    return normalizedGroups.split(',');
+    const group = data.group || []; // Assuming the new field is 'group'
+
+    // If group is an array with a single string value, simply return that string
+    const normalizedGroup = Array.isArray(group) && group.length === 1
+      ? group[0] // Get the first (and only) value
+      : group;
+    
+    return normalizedGroup;
     
     
   } catch (error) {
