@@ -69,7 +69,7 @@ const VideosList = ({ groupedVideos, onClickFromAdminVideo, onClickFromHomeVideo
     }
   };
   
-
+  
   return (
     <div className="list-wrap videos">
       <div className='title-wrap'>

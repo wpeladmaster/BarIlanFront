@@ -11,11 +11,11 @@ const VideoModal = ({
   handleTimeUpdate,
 }) => {
   useEffect(() => {
-    if (selectedVideo && groupedVideos[selectedVideo.sessionName]?.length > 0) {
+    if (selectedVideo) {
       setSelectedSession(selectedVideo.sessionName);
       setActiveTab(selectedVideo.fullVideoName);
     }
-  }, [selectedVideo, groupedVideos, setSelectedSession, setActiveTab]);
+  }, [selectedVideo, setSelectedSession, setActiveTab]);
 
   if (!selectedVideo) return null;
 

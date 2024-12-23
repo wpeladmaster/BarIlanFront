@@ -106,13 +106,13 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
   }, [isStudent, isAuthenticated, userRole, fetchPatients]);
 
   useEffect(() => {
-    if (selectedVideo && groupedVideos[selectedSession]) {
+    if (selectedVideo && selectedSession && groupedVideos[selectedSession]) {
       const sessionVideos = groupedVideos[selectedSession];
       if (sessionVideos && sessionVideos.length) {
-        setActiveTab(sessionVideos[0].fullVideoName);
+        setActiveTab(sessionVideos.find(v => v.fullVideoName === selectedVideo.fullVideoName)?.fullVideoName || sessionVideos[0].fullVideoName);
       }
     }
-  }, [selectedVideo, groupedVideos, selectedSession, activeTab]);
+  }, [selectedVideo, groupedVideos, selectedSession]);
 
   const handleTimeUpdate = (videoKey, currentTime) => {
     setVideoTimes((prev) => ({
@@ -159,6 +159,7 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
   const handleVideoClick = (video) => {
     setSelectedVideo(video);
     setSelectedSession(video.sessionName || '');
+    setActiveTab(video.fullVideoName || '');
   };
 
   return (
