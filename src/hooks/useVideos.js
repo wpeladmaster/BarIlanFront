@@ -9,7 +9,6 @@ const useVideos = (patientCode) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch videos function, moved outside of useEffect to be accessible for return
   const fetchVideos = async (patientCode) => {
     if (!patientCode) {
       console.warn("fetchVideos: patientCode is undefined or null");
@@ -18,8 +17,8 @@ const useVideos = (patientCode) => {
   
     setLoading(true);
     setError(null);
-    setVideos([]); // Clear video list before fetching new data
-    setGroupedVideos({}); // Reset grouped videos before fetching new data
+    setVideos([]);
+    setGroupedVideos({});
   
     try {
       const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
@@ -65,15 +64,13 @@ const useVideos = (patientCode) => {
     }
   };
   
-
-  // Effect hook to fetch videos when the patientCode changes
   useEffect(() => {
     if (patientCode) {
-      fetchVideos(patientCode); // Trigger fetchVideos when patientCode changes
+      fetchVideos(patientCode);
     }
   }, [patientCode, instance]);
 
-  return { videoList, groupedVideos, loading, error, fetchVideos }; // Return fetchVideos
+  return { videoList, groupedVideos, loading, error, fetchVideos };
 };
 
 export default useVideos;

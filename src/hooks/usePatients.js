@@ -20,7 +20,6 @@ const usePatients = () => {
         ],
       });
       const token = tokenResponse.accessToken;
-
       const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
       const fullUrl = `${apiUrl}/fetchpatients?therapistCodeStudent=${userRole}`;
 
@@ -37,8 +36,6 @@ const usePatients = () => {
       }
 
       const data = await response.json();
-      console.log("Fetched patients data:", data);
-
       const patientCodes = data.unique_patients_codes || [];
       setPatients(patientCodes);
 

@@ -30,11 +30,11 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
   const { patients, fetchPatients } = usePatients();
   const { videoList, fetchVideos, groupedVideos } = useVideos();
 
-  useEffect(() => {
-    console.log('userRole:', userRole);
-    console.log('groupNames:', groupNames);
-    console.log('isAuthenticated:', isAuthenticated);
-  }, [userRole, isAuthenticated, groupNames]);
+  // useEffect(() => {
+  //   console.log('userRole:', userRole);
+  //   console.log('groupNames:', groupNames);
+  //   console.log('isAuthenticated:', isAuthenticated);
+  // }, [userRole, isAuthenticated, groupNames]);
 
   const isAdmin = useMemo(() => groupNames.includes('Admins'), [groupNames]);
   const isInstructor = useMemo(() => groupNames.includes('Supervisers'), [groupNames]);
@@ -82,7 +82,6 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
   useEffect(() => {
     const loadStudents = async () => {
       if (isInstructor && isAuthenticated && userRole) {
-        console.log("Fetching students for userRole:", userRole);
         setLoadingStudents(true);
         await fetchStudents(userRole);
         setLoadingStudents(false);
@@ -95,7 +94,6 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
   useEffect(() => {
     const loadPatients = async () => {
       if (isStudent && isAuthenticated && userRole) {
-        console.log("Fetching patients for userRole:", userRole);
         setLoadingPatients(true);
         await fetchPatients(userRole);
         setLoadingPatients(false);
@@ -140,22 +138,19 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
 
   const handlePatientClick = async (patientCode) => {
     if (selectedPatient === patientCode) return;
-    console.log('Fetching videos for patient:', patientCode);
     setSelectedPatient(patientCode);
     setSelectedVideo(null);
     setLoadingVideos(true);
   
     try {
-      await fetchVideos(patientCode); // Call fetchVideos and wait for it to finish
+      await fetchVideos(patientCode);
     } catch (error) {
-      console.error('Error fetching videos:', error); // Handle errors if any
+      console.error('Error fetching videos:', error);
     } finally {
-      setLoadingVideos(false); // Ensure loading state is reset
+      setLoadingVideos(false);
     }
   };
   
-  
-
   const handleVideoClick = (video) => {
     setSelectedVideo(video);
     setSelectedSession(video.sessionName || '');

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import dynamoDB from '../aws/awsConfig';
 import InstructorsList from './lists/InstructorsList';
 import StudentsList from './lists/StudentsList';
 import PatientsList from './lists/PatientsList';
@@ -98,7 +97,9 @@ const AdminSearch = ({ handleStudentClick, handlePatientClick, handleVideoClick 
     }
 
     try {
-      const data = await dynamoDB.scan(params).promise();
+      // For Version 2.0 create admin search component
+      //const data = await dynamoDB.scan(params).promise();
+      const data = []; //Temp
       const uniqueResults = [...new Set(data.Items.map(item => item[getRoleCode(role)] || item.patient_code || item.video_name))];
       return uniqueResults;
     } catch (error) {

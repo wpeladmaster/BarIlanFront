@@ -13,9 +13,6 @@ const useStudents = () => {
       }
 
       try {
-        console.log("Fetching students for role:", userRole);
-
-        // Acquire token silently
         const tokenResponse = await instance.acquireTokenSilent({
           scopes: [
             "openid",
@@ -26,12 +23,9 @@ const useStudents = () => {
           ],
         });
         const token = tokenResponse.accessToken;
-
-        // Build API URL
         const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
         const fullUrl = `${apiUrl}/fetchstudents?therapistCodeLeader=${userRole}`;
 
-        // Fetch student data
         const response = await fetch(fullUrl, {
           method: "GET",
           headers: {
@@ -47,7 +41,6 @@ const useStudents = () => {
         }
 
         const data = await response.json();
-        console.log("Fetched students data:", data);
 
         // Update state with fetched student codes
         const studentCodes = data.unique_student_codes || [];
@@ -63,7 +56,7 @@ const useStudents = () => {
         );
       }
     },
-    [instance] // Dependencies for useCallback
+    [instance]
   );
 
   return { students, fetchStudents };

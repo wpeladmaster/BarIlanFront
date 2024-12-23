@@ -1,4 +1,3 @@
-// src/components/Footer.js
 import React from 'react';
 import '../style/Footer.scss';
 
@@ -10,7 +9,7 @@ const Footer = () => {
             <div className='logo'>
                 <img src='../../images/bar-ilan-logo.png' alt='Logo' />
             </div>
-            <p>&copy; 2024 Bar Ilan University. All rights reserved.</p>
+            <p>&copy; {(new Date().getFullYear())} Bar Ilan University. All rights reserved.</p>
         </div>
     </footer>
   );

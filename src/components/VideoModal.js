@@ -10,7 +10,7 @@ const VideoModal = ({
   setActiveTab,
   handleTimeUpdate,
 }) => {
-  // Ensure selectedVideo and its properties are valid
+
   useEffect(() => {
     if (selectedVideo && selectedVideo.sessionName) {
       setSelectedSession(selectedVideo.sessionName);

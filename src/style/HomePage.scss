@@ -6,13 +6,13 @@
     &.homepage, &.admin-search {
         flex-direction: column;
         justify-content: flex-start;
-        padding: 6rem 8rem 4rem;
+        padding: 6rem 6rem 4rem;
         overflow-y: auto;
         overflow-x: hidden;
-        height: calc(100vh - 42rem);
+        height: calc(100vh - 40rem);
         @include breakpoint(desktop-sm) {
             padding: 2rem 4rem 3rem;
-            height: calc(100vh - 31rem);
+            height: calc(100vh - 30rem);
         }
         @include breakpoint(tablet) {
             padding: 3rem 4rem;
@@ -21,7 +21,7 @@
             padding: 2rem;
         }
         .list-wrap {
-            width: 134rem;
+            width: 136.6rem;
             margin: 0 auto;
             @include breakpoint(desktop-sm) {
                 width: 110rem;

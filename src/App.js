@@ -22,7 +22,7 @@ const App = () => {
 
   useEffect(() => {
     const checkSession = async () => {
-      console.log("App.js: Checking session...");
+      // console.log("App.js: Checking session...");
   
       if (!instance) {
         console.warn("App.js: MSAL instance is not initialized.");
@@ -39,7 +39,7 @@ const App = () => {
   
         const account = instance.getActiveAccount() || allAccounts[0];
         instance.setActiveAccount(account);
-        console.log("App.js: Active account:", account);
+        // console.log("App.js: Active account:", account);
   
         if (!account) {
           console.warn("App.js: No active account set.");
@@ -52,7 +52,6 @@ const App = () => {
         setUserName(account.name || account.username);
         const email = account.username.split('@')[0];
   
-        // Token acquisition
         try {
           const tokenResponse = await instance.acquireTokenSilent({
             scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"]
@@ -84,9 +83,8 @@ const App = () => {
 
   const handleLogin = async () => {
     try {
-      console.log("App.js: Attempting login...");
       const loginResponse = await instance.loginPopup(loginRequest);
-      console.log("App.js: Login successful:", loginResponse);
+      // console.log("App.js: Login successful:", loginResponse);
 
       instance.setActiveAccount(loginResponse.account);
       setIsAuthenticated(true);
@@ -95,14 +93,12 @@ const App = () => {
       setUserName(loginResponse.account.name || loginResponse.account.username);
 
       const token = (await instance.acquireTokenSilent({ scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"] })).accessToken;
-      console.log("App.js: Token acquired post-login.");
-
       const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-      console.log("App.js: API Gateway URL:", apiUrl);
+      // console.log("App.js: API Gateway URL:", apiUrl);
 
       const groups = await fetchGroupNames(apiUrl, token, email);
 
-      console.log("App.js: Groups fetched post-login:", groups);
+      // console.log("App.js: Groups fetched post-login:", groups);
       setGroupNames(groups);
       setUserRole(email);
     } catch (error) {
@@ -112,7 +108,6 @@ const App = () => {
 
   const handleLogout = async () => {
     try {
-      console.log("App.js: Logging out...");
       await instance.logoutPopup({ 
         postLogoutRedirectUri: window.location.origin,
         account: instance.getActiveAccount()
@@ -125,14 +120,12 @@ const App = () => {
       localStorage.clear();
       sessionStorage.clear();
       
-      console.log("App.js: Logout successful.");
     } catch (error) {
       console.error("App.js: Logout error:", error);
     }
   };
 
   if (isLoading) {
-    console.log("App.js: Loading...");
     return <div>Loading...</div>;
   }
 
