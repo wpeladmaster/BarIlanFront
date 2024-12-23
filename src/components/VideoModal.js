@@ -32,6 +32,7 @@ const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSe
           ))}
         </div>
         <div className="tab-content">
+          {console.log('groupedVideos:', groupedVideos)}
           {groupedVideos[selectedSession]?.map((video) => (
             video.fullVideoName === activeTab && (
               <div key={video.fileKey}>

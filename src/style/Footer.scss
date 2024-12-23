@@ -9,15 +9,15 @@ footer {
     right: 0;
     width: 100%;
     background-color: $green;
-    height: 24rem;
+    height: 20rem;
     display: flex;
     justify-content: center;
     align-items: flex-end;
     @include breakpoint(desktop-sm) {
-        height: 18rem;
+        height: 16rem;
     }
     @include breakpoint(mobile) {
-        height: 15rem;
+        height: 14rem;
     }
     .footer-bg {
         background-image: url(../../public/images/footer-bg.webp);
@@ -47,11 +47,11 @@ footer {
         .logo {
             width: 21rem;
             height: 10rem;
-            margin-top: 6rem;
+            margin-top: 4rem;
             @include breakpoint(desktop-sm) {
                 width: 16rem;
                 height: 7rem;
-                margin-top: 4rem;
+                margin-top: 3rem;
             }
             @include breakpoint(mobile) {
                 width: 13rem;
