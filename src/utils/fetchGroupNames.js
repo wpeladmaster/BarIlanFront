@@ -17,24 +17,14 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
     }
 
     const data = await response.json();
-
-    // Extract and normalize the groups
-    const groups = data.group || []; // Assuming the new field is 'groups' instead of 'groups_names'
-
-    // If the groups data is a single string (e.g., "Admins"), we wrap it in an array
-    const normalizedGroups = Array.isArray(groups)
-      ? groups.flatMap(groupString =>
-          typeof groupString === 'string'
-            ? groupString.replace(/[{}"]/g, '').split(',') // Split by commas if there are multiple groups in the string
-            : []
-        )
-      : [groups].flatMap(groupString =>
-          typeof groupString === 'string'
-            ? groupString.replace(/[{}"]/g, '').split(',') // Handle the case where it's just a single string
-            : []
-        );
+    console.log("group data: ", data);
     
-    return normalizedGroups;
+    // Extract and normalize the groups
+    const groups = data.group || '';
+    console.log("groups: ", groups);
+    const normalizedGroups = groups.replace(/[{}"]/g, '');
+    console.log("normalizedGroups: ", normalizedGroups);
+    return normalizedGroups.split(',');
     
     
   } catch (error) {
