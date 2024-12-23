@@ -1,33 +1,32 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSession, activeTab, setActiveTab, handleTimeUpdate }) => {
-  
-  console.log("From selectedVideo param: ", selectedVideo);
-  console.log("From setSelectedVideo param: ", setSelectedVideo);
-  console.log("From groupedVideos param: ", groupedVideos);
-  console.log("From selectedSession param: ", selectedSession);
-  console.log("From activeTab param: ", activeTab);
-  console.log("From setActiveTab param: ", setActiveTab);
-  console.log("From handleTimeUpdate param: ", handleTimeUpdate);
-
+const VideoModal = ({
+  selectedVideo,
+  setSelectedVideo,
+  groupedVideos,
+  selectedSession,
+  activeTab,
+  setActiveTab,
+  handleTimeUpdate,
+}) => {
   useEffect(() => {
-    if (groupedVideos[selectedSession] && groupedVideos[selectedSession].length > 0) {
+    if (selectedSession && groupedVideos[selectedSession]?.length > 0) {
       setActiveTab(groupedVideos[selectedSession][0].fullVideoName);
     }
-  }, [selectedVideo, groupedVideos, selectedSession, setActiveTab]);
+  }, [groupedVideos, selectedSession, setActiveTab]);
 
-
-    if (!selectedVideo) return null;
+  if (!selectedVideo) return null;
 
   const handleTabChange = (tab) => {
-    console.log("From handleTabChange tab: ", tab);
     setActiveTab(tab);
   };
 
   return (
     <div className="modal">
       <div className="modal-content">
-        <span className="close" onClick={() => setSelectedVideo(null)}>&times;</span>
+        <span className="close" onClick={() => setSelectedVideo(null)}>
+          &times;
+        </span>
         <div className="tabs">
           {groupedVideos[selectedSession]?.map((video) => (
             <button
@@ -40,61 +39,52 @@ const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSe
           ))}
         </div>
         <div className="tab-content">
-          {console.log('groupedVideos:', groupedVideos)}
-          {groupedVideos[selectedSession]?.map((video) => (
-            video.fullVideoName === activeTab && (
+          {groupedVideos[selectedSession]?.map((video) =>
+            video.fullVideoName === activeTab ? (
               <div key={video.fileKey}>
-                {video.s3Url ? (
-                  <>
-                    {console.log('video:', video)}
-                    <video width="560" height="315" src={video.s3Url} controls onTimeUpdate={(e) => handleTimeUpdate(video.fileKey, e.target.currentTime)}></video>
-                    <div className="video-details">
-                      <h4>Session Details:</h4>
-                      <div className='lists-wrapper'>
-                        <dl>
-                          <div className='detail'>
-                            <dt>Unique Session Name:</dt>
-                            <dd>{video.uniqueSessionName}</dd>
-                          </div>
-                          <div className='detail'>
-                            <dt>Camera:</dt>
-                            <dd>{video.cameraName}</dd>
-                          </div>
-                          <div className='detail'>
-                            <dt>Meeting Number:</dt>
-                            <dd>{video.roomNum}</dd>
-                          </div>
-                          <div className='detail'>
-                            <dt>Room Number:</dt>
-                            <dd>{video.meetingNum}</dd>
-                          </div>
-                        </dl>
-                        <dl>
-                        {video.date && video.date !== 'unknown' && (
-                          <div className='detail'>
-                              <dt>Date:</dt>
-                              <dd>{new Date(video.date).toLocaleDateString('he-IL')}</dd>
-                          </div>
-                          )}
-                          <div className='detail'>
-                            <dt>Patient Code:</dt>
-                            <dd>{video.patientCode}</dd>
-                          </div>
-                          <div className='detail'>
-                            <dt>Therapist Code:</dt>
-                            <dd>{video.therapistCode}</dd>
-                          </div>
-                        </dl>
+                <video
+                  width="560"
+                  height="315"
+                  src={video.s3Url}
+                  controls
+                  onTimeUpdate={(e) =>
+                    handleTimeUpdate(video.fileKey, e.target.currentTime)
+                  }
+                ></video>
+                <div className="video-details">
+                  <h4>Session Details:</h4>
+                  <div className="lists-wrapper">
+                    <dl>
+                      <div className="detail">
+                        <dt>Unique Session Name:</dt>
+                        <dd>{video.uniqueSessionName}</dd>
                       </div>
-
-                    </div>
-                  </>
-                ) : (
-                  <p>Session not available.</p>
-                )}
+                      <div className="detail">
+                        <dt>Camera:</dt>
+                        <dd>{video.cameraName}</dd>
+                      </div>
+                      <div className="detail">
+                        <dt>Meeting Number:</dt>
+                        <dd>{video.meetingNum}</dd>
+                      </div>
+                      <div className="detail">
+                        <dt>Room Number:</dt>
+                        <dd>{video.roomNum}</dd>
+                      </div>
+                    </dl>
+                    {video.date && video.date !== 'unknown' && (
+                      <dl>
+                        <div className="detail">
+                          <dt>Date:</dt>
+                          <dd>{video.date}</dd>
+                        </div>
+                      </dl>
+                    )}
+                  </div>
+                </div>
               </div>
-            )
-          ))}
+            ) : null
+          )}
         </div>
       </div>
     </div>
