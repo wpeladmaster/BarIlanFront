@@ -1,4 +1,3 @@
-// VideoModal.js
 import React, { useEffect } from 'react';
 
 const VideoModal = ({
@@ -6,15 +5,17 @@ const VideoModal = ({
   setSelectedVideo,
   groupedVideos,
   selectedSession,
+  setSelectedSession,
   activeTab,
   setActiveTab,
   handleTimeUpdate,
 }) => {
   useEffect(() => {
-    if (selectedSession && groupedVideos[selectedSession]?.length > 0) {
-      setActiveTab(groupedVideos[selectedSession][0].fullVideoName);
+    if (selectedVideo && groupedVideos[selectedVideo.sessionName]?.length > 0) {
+      setSelectedSession(selectedVideo.sessionName);
+      setActiveTab(selectedVideo.fullVideoName);
     }
-  }, [groupedVideos, selectedSession, setActiveTab]);
+  }, [selectedVideo, groupedVideos, setSelectedSession, setActiveTab]);
 
   if (!selectedVideo) return null;
 
