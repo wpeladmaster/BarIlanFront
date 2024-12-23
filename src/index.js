@@ -36,7 +36,7 @@ const initializeApp = async () => {
   try {
     // Ensure MSAL is fully initialized
     await msalInstance.initialize();
-    console.log("MSAL initialized successfully.");
+    //console.log("MSAL initialized successfully.");
 
     // Render the app after successful initialization
     ReactDOM.render(

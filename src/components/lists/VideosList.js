@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import VideosListItems from '../ListItems/VideosListItems';
 
 const VideosList = ({ groupedVideos, onClickFromAdminVideo, onClickFromHomeVideo }) => {
-  console.log("From click handler --onClickFromHomeVideo--: ", onClickFromHomeVideo);
-  console.log("From click handler --groupedVideos--: ", groupedVideos);
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -12,7 +10,6 @@ const VideosList = ({ groupedVideos, onClickFromAdminVideo, onClickFromHomeVideo
     return <div>No videos found</div>;
   }
 
-  // Function to filter videos by date range
   const filterByDateRange = (lastModified = null) => {
     if (!dateFrom || !dateTo) return true;
     if (lastModified === 'Unknown') return true;

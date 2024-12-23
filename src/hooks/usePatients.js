@@ -12,7 +12,6 @@ const usePatients = () => {
     }
 
     try {
-      console.log("Fetching patients for role:", userRole);
       const tokenResponse = await instance.acquireTokenSilent({
         scopes: [
           "openid", "profile", "email", "User.Read",

@@ -16,7 +16,7 @@ const VideoModal = ({
       setSelectedSession(selectedVideo.sessionName);
       setActiveTab(selectedVideo.fullVideoName);
     } else {
-      console.warn("selectedVideo or sessionName is invalid:", selectedVideo);
+      console.warn("selectedVideo or sessionName is invalid:");
     }
   }, [selectedVideo, setSelectedSession, setActiveTab]);
 
