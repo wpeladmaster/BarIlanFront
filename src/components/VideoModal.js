@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// VideoModal.js
+import React, { useEffect } from 'react';
 
 const VideoModal = ({
   selectedVideo,
@@ -31,7 +32,7 @@ const VideoModal = ({
           {groupedVideos[selectedSession]?.map((video) => (
             <button
               key={video.fileKey}
-              className={video.fullVideoName === activeTab ? 'active' : ''}
+              className={`tab-button ${video.fullVideoName === activeTab ? 'active' : ''}`}
               onClick={() => handleTabChange(video.fullVideoName)}
             >
               {video.fullVideoName}
@@ -41,7 +42,7 @@ const VideoModal = ({
         <div className="tab-content">
           {groupedVideos[selectedSession]?.map((video) =>
             video.fullVideoName === activeTab ? (
-              <div key={video.fileKey}>
+              <div key={video.fileKey} className="video-container">
                 <video
                   width="560"
                   height="315"

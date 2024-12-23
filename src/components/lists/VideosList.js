@@ -1,3 +1,4 @@
+// VideosList.js
 import React, { useState } from 'react';
 import VideosListItems from '../ListItems/VideosListItems';
 
@@ -11,12 +12,18 @@ const VideosList = ({
   const [dateTo, setDateTo] = useState('');
 
   const filterVideos = () => {
-    // Add filtering logic based on search term and date
     return Object.entries(groupedVideos).map(([sessionName, sessionVideos]) => {
-      // Filtering logic
       return {
         sessionName,
-        videos: sessionVideos.filter((video) => true), // Update condition
+        videos: sessionVideos.filter((video) => {
+          const matchesSearch = video.fullVideoName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+          const matchesDate =
+            (!dateFrom || new Date(video.date) >= new Date(dateFrom)) &&
+            (!dateTo || new Date(video.date) <= new Date(dateTo));
+          return matchesSearch && matchesDate;
+        }),
       };
     });
   };
@@ -24,17 +31,37 @@ const VideosList = ({
   const filteredVideos = filterVideos();
 
   const handleVideoClick = (video) => {
-    // Update modal states here
-    console.log('Video clicked:', video);
+    if (onClickFromAdminVideo) {
+      onClickFromAdminVideo(video);
+    } else if (onClickFromHomeVideo) {
+      onClickFromHomeVideo(video);
+    }
   };
 
   return (
-    <div>
-      <div>Search bar logic</div>
-      <ul>
+    <div className="videos-list">
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Search by video name"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <input
+          type="date"
+          value={dateFrom}
+          onChange={(e) => setDateFrom(e.target.value)}
+        />
+        <input
+          type="date"
+          value={dateTo}
+          onChange={(e) => setDateTo(e.target.value)}
+        />
+      </div>
+      <ul className="sessions-list">
         {filteredVideos.map(({ sessionName, videos }) => (
-          <li key={sessionName}>
-            <h3>{sessionName}</h3>
+          <li key={sessionName} className="session-item">
+            <h3 className="session-title">{sessionName}</h3>
             <VideosListItems videos={videos} onVideoClick={handleVideoClick} />
           </li>
         ))}
