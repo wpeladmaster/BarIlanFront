@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import VideosListItems from '../ListItems/VideosListItems';
 
 const VideosList = ({ groupedVideos, onClickFromAdminVideo, onClickFromHomeVideo }) => {
+  console.log("From param --onClickFromHomeVideo--: ", onClickFromHomeVideo);
+  console.log("From param --groupedVideos--: ", groupedVideos);
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -65,6 +67,9 @@ const VideosList = ({ groupedVideos, onClickFromAdminVideo, onClickFromHomeVideo
       onClickFromAdminVideo(patientCode, video);
     }
     if (onClickFromHomeVideo) {
+      console.log("From click handler video: ", video);
+      console.log("From click handler patientCode:", patientCode);
+      
       onClickFromHomeVideo(patientCode);
     }
   };

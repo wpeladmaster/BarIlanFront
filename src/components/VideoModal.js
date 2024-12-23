@@ -2,6 +2,13 @@ import React, { useEffect } from 'react';
 
 const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSession, activeTab, setActiveTab, handleTimeUpdate }) => {
   
+  console.log("From selectedVideo param: ", selectedVideo);
+  console.log("From setSelectedVideo param: ", setSelectedVideo);
+  console.log("From groupedVideos param: ", groupedVideos);
+  console.log("From selectedSession param: ", selectedSession);
+  console.log("From activeTab param: ", activeTab);
+  console.log("From setActiveTab param: ", setActiveTab);
+  console.log("From handleTimeUpdate param: ", handleTimeUpdate);
 
   useEffect(() => {
     if (groupedVideos[selectedSession] && groupedVideos[selectedSession].length > 0) {
@@ -13,6 +20,7 @@ const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSe
     if (!selectedVideo) return null;
 
   const handleTabChange = (tab) => {
+    console.log("From handleTabChange tab: ", tab);
     setActiveTab(tab);
   };
 
