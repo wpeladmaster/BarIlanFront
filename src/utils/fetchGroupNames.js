@@ -19,7 +19,7 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
     const data = await response.json();
 
     // Extract and normalize the groups
-    const groups = data.groups || ""; // Retrieve groups as a string from the data
+    const groups = data.group || ""; // Retrieve groups as a string from the data
 
     // Normalize groups from a string into an array of cleaned group names
     const normalizedGroups = groups
