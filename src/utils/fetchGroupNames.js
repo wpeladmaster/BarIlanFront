@@ -19,16 +19,23 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
     const data = await response.json();
 
     // Extract and normalize the groups
-    const groups = data.group || ""; // Retrieve groups as a string from the data
+    const groups = data.group || []; // Assuming the new field is 'groups' instead of 'groups_names'
 
-    // Normalize groups from a string into an array of cleaned group names
-    const normalizedGroups = groups
-      .replace(/[{}"]/g, '')
-      .split(',')
-      .map(group => group.trim())
-      .filter(group => group.length > 0);
+    // If the groups data is a single string (e.g., "Admins"), we wrap it in an array
+    const normalizedGroups = Array.isArray(groups)
+      ? groups.flatMap(groupString =>
+          typeof groupString === 'string'
+            ? groupString.replace(/[{}"]/g, '').split(',') // Split by commas if there are multiple groups in the string
+            : []
+        )
+      : [groups].flatMap(groupString =>
+          typeof groupString === 'string'
+            ? groupString.replace(/[{}"]/g, '').split(',') // Handle the case where it's just a single string
+            : []
+        );
     
     return normalizedGroups;
+    
     
   } catch (error) {
     console.error("fetchGroupNames.js: Error fetching user groups:", error);
