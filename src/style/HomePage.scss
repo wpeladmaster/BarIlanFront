@@ -99,18 +99,18 @@
                 justify-content: center;
                 align-items: center;
                 gap: 0.8rem;
-                margin-bottom: 3.4rem;
+                margin-bottom: 2.2rem;
                 @include breakpoint(desktop-sm) {
-                    margin-bottom: 3rem;
-                }
-                @include breakpoint(tablet) {
-                    margin-bottom: 2.4rem;
-                }
-                @include breakpoint(mobile) {
                     margin-bottom: 2rem;
                 }
+                @include breakpoint(tablet) {
+                    margin-bottom: 1.8rem;
+                }
+                @include breakpoint(mobile) {
+                    margin-bottom: 1.63rem;
+                }
                 > h2 {
-                    font-size: 3.4rem;
+                    font-size: 3.2rem;
                     margin: 0;
                     @include breakpoint(desktop-sm) {
                         font-size: 3rem;
