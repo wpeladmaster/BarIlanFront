@@ -25,9 +25,12 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "start:dev": "cross-env PORT=5000 REACT_APP_STAGE=development react-scripts start",
-    "start:prod": "cross-env PORT=5000 REACT_APP_STAGE=production react-scripts start"
+    "build:stage": "cross-env dotenv -e .env.stage react-scripts build",
+    "build:production": "cross-env dotenv -e .env.production react-scripts build",
+    "start:stage": "cross-env PORT=5000 REACT_APP_REDIRECT_URI=https://barilanclinics.eladtest.com/homepage react-scripts start",
+    "start:prod": "cross-env PORT=5000 REACT_APP_REDIRECT_URI=https://biuclinics.com/homepage react-scripts start"
   },
+
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -45,5 +48,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "dotenv-cli": "^8.0.0"
   }
 }
