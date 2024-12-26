@@ -6,9 +6,9 @@ const path = require('path');
 const app = express();
 
 // Load SSL certificate files
-const privateKey = fs.readFileSync('/home/ubuntu/BarIlanApp/private.key ', 'utf8');
-const certificate = fs.readFileSync('/home/ubuntu/BarIlanApp/certificate.crt ', 'utf8');
-const caBundle = fs.readFileSync('/home/ubuntu/BarIlanApp/ca_bundle.crt', 'utf8');
+const privateKey = fs.readFileSync('/home/ubuntu/BarIlan/private.key ', 'utf8');
+const certificate = fs.readFileSync('/home/ubuntu/BarIlan/certificate.crt ', 'utf8');
+const caBundle = fs.readFileSync('/home/ubuntu/BarIlan/ca_bundle.crt', 'utf8');
 
 const credentials = {
   key: privateKey,
