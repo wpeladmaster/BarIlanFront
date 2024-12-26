@@ -59,14 +59,13 @@ const App = () => {
           const token = tokenResponse.accessToken;
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
 
-          console.log("apiUrl:", apiUrl);
-          console.log("token:", token);
-          console.log("email:", email);
-
+          // console.log("apiUrl:", apiUrl);
+          // console.log("token:", token);
+          // console.log("email:", email);
 
           const groups = await fetchGroupNames(apiUrl, token, email);
 
-          console.log("groups:", groups);
+          //console.log("groups:", groups);
 
           setIsLoading(true);
           

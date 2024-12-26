@@ -40,7 +40,7 @@ const HomePage = ({ isAuthenticated, groupNames, userRole }) => {
   const isInstructor = useMemo(() => groupNames.includes('Supervisers'), [groupNames]);
   const isStudent = useMemo(() => groupNames.includes('Therapists'), [groupNames]);
 
-  console.log("isAdmin:", isAdmin);
+  //console.log("isAdmin:", isAdmin);
 
   useEffect(() => {
     if (!isAdmin) return;
