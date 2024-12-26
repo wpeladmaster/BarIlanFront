@@ -16,15 +16,18 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
       throw new Error(`Failed to fetch groups: ${response.statusText} (${response.status})`);
     }
 
+    console.log("response:", response);
     const data = await response.json();
-  
+    console.log("data:", data);
     // Extract and normalize the groups
     const group = data.group || [];
-
+    console.log("Group:", group);
+    
     const normalizedGroup = Array.isArray(group) && group.length === 1
       ? group[0]
       : group;
-    
+
+    console.log("normalizedGroup:", normalizedGroup);
     return normalizedGroup;
     
     
