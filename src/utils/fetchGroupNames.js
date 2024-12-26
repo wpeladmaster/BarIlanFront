@@ -6,7 +6,7 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
       method: 'GET',
       headers: {
         Authorization: token,
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
     });
 
