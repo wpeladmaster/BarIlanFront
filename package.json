@@ -29,7 +29,7 @@
     "build:stage": "cross-env dotenv -e .env.stage react-scripts build",
     "build:production": "cross-env dotenv -e .env.production react-scripts build",
     "start:stage": "cross-env REACT_APP_REDIRECT_URI=https://barilanclinics.eladtest.com/homepage react-scripts start",
-    "start:prod": "cross-env PORT=5000 REACT_APP_REDIRECT_URI=https://psyclinics.biu.ac.il/homepage react-scripts start",
+    "start:prod": "cross-env REACT_APP_REDIRECT_URI=https://psyclinics.biu.ac.il/homepage react-scripts start",
     "start:ssl": "node server.js"
   },
   "eslintConfig": {
