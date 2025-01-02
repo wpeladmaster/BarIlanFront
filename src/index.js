@@ -6,8 +6,8 @@ import App from './App';
 
 const msalConfig = {
   auth: {
-    clientId: "aadb3f2f-d35f-4080-bc72-2ee32b741120",
-    authority: "https://login.microsoftonline.com/352ed1fa-2f18-487f-a4cf-4804faa235c7/saml2",
+    clientId: process.env.REACT_APP_CLIENT_ID,
+    authority: process.env.REACT_APP_AUTHRITY_URL,
     redirectUri: process.env.REACT_APP_REDIRECT_URI
   },
   cache: {
