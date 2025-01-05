@@ -52,6 +52,14 @@ const App = () => {
         setUserName(account.name || account.username);
         const email = account.username.split('@')[0];
   
+        console.log("Email before cleaning:", email);
+
+        if (email.length === 0) {
+          throw new Error('Username cannot be empty!');
+        } else {
+          email.replace(/[^a-zA-Z0-9_]/g, '');
+        }
+
         try {
           const tokenResponse = await instance.acquireTokenSilent({
             scopes: ["openid", "profile", "email", "User.Read", "api://saml_barilan/user_impersonation/user_impersonation"]
@@ -61,7 +69,7 @@ const App = () => {
 
           // console.log("apiUrl:", apiUrl);
           // console.log("token:", token);
-          // console.log("email:", email);
+          console.log("Email after clean speicel char's:", email);
 
           const groups = await fetchGroupNames(apiUrl, token, email);
 
