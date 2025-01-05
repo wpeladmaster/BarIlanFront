@@ -2,12 +2,19 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
 
   try {
     const fullUrl = `${apiUrl}/fetchgroups?therapist_code=${therapist_code}`;
+
+
+    const headers = {
+      Authorization: token,
+      'Content-Type': 'application/json',
+    };
+    if (process.env.REACT_APP_REDIRECT_URI?.includes('psyclinics.biu.ac.il')) {
+      headers['x-apigw-api-id'] = 'hpser6iqwb';
+    }
+
     const response = await fetch(fullUrl, {
       method: 'GET',
-      headers: {
-        Authorization: token,
-        'Content-Type': 'application/json'
-      },
+      headers,
     });
 
     if (!response.ok) {
