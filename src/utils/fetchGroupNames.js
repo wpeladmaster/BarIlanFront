@@ -2,11 +2,13 @@ const fetchGroupNames = async (apiUrl, token, therapist_code) => {
 
   try {
     const fullUrl = `${apiUrl}/fetchgroups?therapist_code=${therapist_code}`;
+    const apiId = 'hpser6iqwb';
     const response = await fetch(fullUrl, {
       method: 'GET',
       headers: {
         Authorization: token,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-apigw-api-id': apiId
       },
     });
 
