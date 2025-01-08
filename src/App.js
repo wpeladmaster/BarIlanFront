@@ -54,11 +54,11 @@ const App = () => {
   
         console.log("Email before cleaning:", email);
 
-        if (email.length === 0) {
-          throw new Error('Username cannot be empty!');
-        } else {
-          email.replace(/[^a-zA-Z0-9_]/g, '');
-        }
+        // if (email.length === 0) {
+        //   throw new Error('Username cannot be empty!');
+        // } else {
+        //   email.replace(/[^a-zA-Z0-9_]/g, '');
+        // }
 
         try {
           const tokenResponse = await instance.acquireTokenSilent({
