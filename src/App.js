@@ -50,7 +50,12 @@ const App = () => {
         }
   
         setUserName(account.name || account.username);
-        const email = account.username.split('@')[0];
+        let email = account.username.split('@')[0];
+        
+        // Check if email domain contains "live"
+        if (account.username.split('@')[1].includes('live')) {
+            email = email + '-live';
+        }
   
         console.log("Email before cleaning:", email);
 
