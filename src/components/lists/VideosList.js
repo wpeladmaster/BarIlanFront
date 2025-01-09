@@ -27,8 +27,8 @@ const VideosList = ({ groupedVideos, onClickFromAdminVideo, onClickFromHomeVideo
   const parseDate = (dateStr) => {
     const parsedDate = Date.parse(dateStr);
     if (isNaN(parsedDate)) {
-      // Assume the date format is DD-MM-YYYY, try converting it
-      const parts = dateStr.split('-');
+      // Handle both dd-mm-yyyy and dd_mm_yyyy formats
+      const parts = dateStr.split(/[-_]/); // Split on either - or _
       if (parts.length === 3) {
         const [day, month, year] = parts;
         return new Date(`${year}-${month}-${day}`);
